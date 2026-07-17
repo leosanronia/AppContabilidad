@@ -26,6 +26,7 @@ y actualizar ese HTML en el mismo turno, sin que el usuario lo pida:
 - Siempre actualizar el **contador global** de la sección 5 (totales por
   estado) cuando cambie cualquier estado.
 
+
 Una tarea NO está terminada hasta que este documento refleje su efecto.
 
 ---
