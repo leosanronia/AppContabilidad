@@ -1,0 +1,54 @@
+# ============================================================
+# DATOS FINANCIEROS REALES — NUNCA al repositorio
+# ============================================================
+# Hojas de calculo (el Excel CONTABILIDAD y cualquier copia)
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+
+# CSVs de import/backup (van directo a Supabase, nunca por el repo)
+*.csv
+
+# Carpetas de datos o respaldos locales
+datos/
+backups/
+exports/
+
+# ============================================================
+# CREDENCIALES Y CONFIGURACION LOCAL
+# ============================================================
+# Variables de entorno (URL y anon key de Supabase)
+.env
+.env.*
+# La plantilla SIN valores reales si se permite
+!.env.example
+*.local
+
+# ============================================================
+# NODE / VITE (proyecto frontend)
+# ============================================================
+node_modules/
+dist/
+dist-ssr/
+.vite/
+coverage/
+*.log
+npm-debug.log*
+
+# ============================================================
+# EDITOR / SISTEMA OPERATIVO
+# ============================================================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.sw?
+
+# ============================================================
+# NO PERTENECE A ESTE PROYECTO
+# ============================================================
+# Documento de ejemplo traido de otro proyecto (solo referencia local)
+ESTADO_DEL_PROYECTO.html

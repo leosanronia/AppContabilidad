@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App de finanzas personales — Historias de usuario</title>
+  <style>
+:root {
+  --azul:      #003865;
+  --azul-med:  #005A9C;
+  --azul-cl:   #E8F1FA;
+  --verde:     #1A7A4A;
+  --verde-cl:  #E6F4EC;
+  --naranja:   #C85A00;
+  --gris-cl:   #F5F6F8;
+  --gris-brd:  #D0D5DD;
+  --texto:     #1A1F2B;
+  --subtexto:  #4A5568;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: var(--texto); background: #F0F2F5; line-height: 1.7; }
+header { background: linear-gradient(135deg, var(--azul) 0%, var(--azul-med) 100%); color: #fff; padding: 48px 60px 40px; }
+header .badge { display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35); border-radius: 20px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 4px 14px; margin-bottom: 16px; }
+header h1 { font-size: 2rem; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
+header p  { font-size: 15px; opacity: .85; max-width: 640px; }
+.container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+section { margin-bottom: 48px; }
+h2 { font-size: 1.25rem; font-weight: 700; color: var(--azul); border-left: 4px solid var(--azul-med); padding-left: 14px; margin-bottom: 20px; }
+h3 { font-size: 1rem; font-weight: 700; color: var(--azul-med); margin: 24px 0 10px; }
+p  { margin-bottom: 12px; color: var(--subtexto); }
+.card { background: #fff; border: 1px solid var(--gris-brd); border-radius: 10px; padding: 24px 28px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+.card h3 { margin-top: 0; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 20px; font-size: 14px; }
+thead { background: var(--azul); color: #fff; }
+thead th { padding: 12px 16px; text-align: left; font-weight: 600; }
+tbody tr:nth-child(even) { background: var(--gris-cl); }
+tbody td { padding: 11px 16px; border-bottom: 1px solid var(--gris-brd); }
+tbody tr:last-child td { border-bottom: none; }
+code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; padding: 2px 7px; font-family: 'Cascadia Code','Consolas',monospace; font-size: 13px; }
+.formula-box { background: #1E2A3A; color: #A8D8A8; font-family: 'Cascadia Code','Consolas',monospace; font-size: 14px; border-radius: 8px; padding: 18px 24px; margin: 16px 0; }
+.callout { display: flex; gap: 14px; background: var(--verde-cl); border: 1px solid #A3D9B8; border-radius: 8px; padding: 16px 20px; margin: 16px 0; font-size: 14px; color: var(--verde); }
+.callout.naranja { background: #FFF4EC; border-color: #F9C784; color: var(--naranja); }
+.callout .icon { font-size: 20px; flex-shrink: 0; line-height: 1.5; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 620px) { .card-grid { grid-template-columns: 1fr; } }
+.escala { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+.nivel { flex: 1 1 140px; border-radius: 8px; padding: 14px 16px; text-align: center; font-weight: 700; font-size: 13px; }
+.nivel span { display: block; font-size: 11px; font-weight: 400; margin-top: 4px; }
+.muy-alta { background: #FDECEA; color: #B71C1C; border: 1px solid #FFCDD2; }
+.alta     { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
+.media    { background: #FFFDE7; color: #F57F17; border: 1px solid #FFF9C4; }
+.baja     { background: #E8F5E9; color: #1B5E20; border: 1px solid #C8E6C9; }
+.muy-baja { background: var(--gris-cl); color: #555; border: 1px solid var(--gris-brd); }
+.chip { display: inline-block; background: var(--azul-cl); color: var(--azul-med); border-radius: 20px; font-size: 12px; padding: 3px 12px; margin: 2px; font-weight: 600; }
+.diagrama { background: #1E2A3A; color: #CBD5E0; font-family: 'Cascadia Code','Consolas',monospace; font-size: 13px; line-height: 1.9; border-radius: 10px; padding: 28px 32px; overflow-x: auto; }
+.diagrama .hl  { color: #90CDF4; }
+.diagrama .hl2 { color: #9AE6B4; }
+.diagrama .hl3 { color: #FBD38D; }
+.lista { list-style: none; padding: 0; margin: 12px 0; }
+.lista li { padding: 8px 0 8px 24px; position: relative; color: var(--subtexto); font-size: 14px; border-bottom: 1px solid var(--gris-brd); }
+.lista li:last-child { border-bottom: none; }
+.lista li::before { content: "▸"; position: absolute; left: 4px; color: var(--azul-med); }
+
+/* --- estados de las historias de usuario --- */
+.estado { display: inline-block; border-radius: 20px; font-size: 12px; font-weight: 700; padding: 3px 12px; white-space: nowrap; }
+.estado.pendiente  { background: var(--gris-cl); color: #555; border: 1px solid var(--gris-brd); }
+.estado.encurso    { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
+.estado.completada { background: var(--verde-cl); color: var(--verde); border: 1px solid #A3D9B8; }
+.estado.descartada { background: #FDECEA; color: #B71C1C; border: 1px solid #FFCDD2; }
+.hu-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.hu-head h3 { margin: 0; }
+.historia { background: var(--azul-cl); border-radius: 8px; padding: 12px 18px; margin: 10px 0 14px; font-size: 14px; color: var(--azul); font-style: italic; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Plan de proyecto · Historias de usuario</div>
+  <h1>App de finanzas personales — Historias de usuario</h1>
+  <p>Reemplazar la hoja de Excel <code>CONTABILIDAD</code> por una app web que replique el sistema
+  que ya funciona, sin fricción manual, con la data ordenada para poder hacer dashboards,
+  seguimiento y proyecciones.</p>
+</header>
+
+<div class="container">
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>1. Resumen</h2>
+    <p>
+      Hoy las finanzas personales se llevan en un Excel que <strong>ya funciona</strong>: cada semana
+      se registran los saldos de las cuentas, la diferencia de patrimonio contra la semana anterior
+      da el gasto de la semana (sin anotar recibo por recibo), y a fin de mes se arma un presupuesto
+      por categoría con saldos que se arrastran de un mes al siguiente. El problema no es el método
+      — es la <strong>fricción</strong>: copiar columnas, cuadrar fórmulas a mano, y no poder
+      registrar cómodamente desde el celular.
+    </p>
+    <p>
+      Este proyecto construye una app web personal (un solo usuario) que replica ese sistema.
+      Los datos viven en la nube: se registra desde el <strong>celular</strong> durante la semana y
+      se consolida desde el <strong>computador</strong>. Stack: React + Vite + TypeScript en el
+      frontend, <strong>Supabase</strong> (Postgres) para los datos y <strong>Netlify</strong> para
+      el hosting — todo en planes gratuitos.
+    </p>
+    <p>
+      Este documento es el <strong>tablero de control del proyecto</strong>: define los objetivos,
+      parte el trabajo en historias de usuario (HU) agrupadas por fases, y lleva el registro de
+      cuáles se completaron y cuáles no. Se irá actualizando a medida que se ataque cada HU.
+    </p>
+    <div class="callout naranja">
+      <div class="icon">⚠️</div>
+      <div><strong>Principio rector:</strong> el Excel ya funciona. Si la app termina siendo más
+      complicada de usar que el Excel, no sirve. Cada HU debe <em>quitar</em> fricción, nunca
+      agregarla. En la duda, la opción más simple gana.</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>2. Objetivos</h2>
+
+    <h3>Objetivo principal</h3>
+    <p>
+      <strong>Ordenar la forma de hacer las cuentas.</strong> Pasar del Excel manual a una app que
+      guarde los mismos datos, calcule sola lo que hoy se cuadra a mano, y valide que todo sea
+      consistente.
+    </p>
+
+    <h3>Objetivos derivados (posibles gracias a la data ordenada)</h3>
+    <ul class="lista">
+      <li><strong>Registro sin fricción:</strong> anotar un gasto desde el celular en segundos y
+        consolidar la semana desde el computador, con los datos siempre sincronizados.</li>
+      <li><strong>Cálculo automático del gasto semanal:</strong> la reconciliación de patrimonio
+        (el corazón del sistema) la hace la app, no el usuario.</li>
+      <li><strong>Presupuesto con arrastre automático:</strong> el "Por pagar" de cada categoría
+        fluye solo de un mes al siguiente, sin copiar columnas.</li>
+      <li><strong>Validaciones automáticas:</strong> el validador semanal y el "Disponible" mensual
+        avisan solos cuando algo no cuadra.</li>
+      <li><strong>Dashboards y seguimiento:</strong> ver la evolución del patrimonio, del gasto
+        semanal y de cada cuenta en el tiempo.</li>
+      <li><strong>Supuestos y proyecciones:</strong> con el histórico estructurado, proyectar el
+        patrimonio y simular escenarios simples ("¿y si gasto X a la semana?").</li>
+      <li><strong>Costo cero y datos protegidos:</strong> planes gratuitos de Netlify y Supabase;
+        credenciales y datos financieros nunca en el repositorio.</li>
+    </ul>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>3. El sistema actual en Excel (lo que hay que replicar)</h2>
+    <p>
+      Verificado contra la hoja <code>2026</code> del archivo
+      <code>CONTABILIDAD - copia 052526.xlsx</code> (filas 1–69). Cada bloque del Excel tiene un
+      equivalente directo en el modelo de datos de la app:
+    </p>
+    <table>
+      <thead>
+        <tr><th>Bloque del Excel</th><th>Filas</th><th>Qué hace</th><th>En la app</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ingresos de la semana</td><td>2–9</td>
+          <td>Ingresos con nombre (INT, Prima, Arriendo…) y su TOTAL, por semana.</td>
+          <td><code>ingresos</code></td>
+        </tr>
+        <tr>
+          <td>Egresos de la semana</td><td>10–20</td>
+          <td>La línea "Semana XXX" (gasto no rastreado) + gastos anotados con nombre
+            (Mercado, Claro, Admin…).</td>
+          <td><code>movimientos</code> + <code>semanas.gasto_semana</code></td>
+        </tr>
+        <tr>
+          <td>Balance — lo que tengo</td><td>21–29</td>
+          <td>Total tarjeta, Efectivo y Nequi, Apto, Carlos/OTH, Me debo, Fondo inversión,
+            Fondo libertad, Me deben — con su TOTAL.</td>
+          <td><code>agrupadores</code> (liquidez / patrimonio) + <code>items_balance</code> +
+            <code>saldos_semana</code></td>
+        </tr>
+        <tr>
+          <td>Balance — lo que debo</td><td>30–33</td>
+          <td>Rappi, Occidente, Debo — con su TOTAL.</td>
+          <td><code>agrupadores</code> (deuda)</td>
+        </tr>
+        <tr>
+          <td>Patrimonio neto</td><td>34</td>
+          <td>TOTAL: lo que tengo menos lo que debo.</td>
+          <td>Calculado (no se almacena)</td>
+        </tr>
+        <tr>
+          <td>DIFERENCIA + VALIDADOR</td><td>35–37</td>
+          <td>La diferencia de neto entre semanas debe igualar el total de egresos. Si no
+            cuadra, hubo un error anotando.</td>
+          <td>Gasto por reconciliación + validador semanal</td>
+        </tr>
+        <tr>
+          <td>Presupuesto mensual</td><td>39–67</td>
+          <td>Por categoría: Plan, Plan + mes anterior, Gasto, Por pagar. Los saldos se
+            arrastran al mes siguiente.</td>
+          <td><code>categorias</code> + <code>presupuesto</code> (derivados calculados)</td>
+        </tr>
+        <tr>
+          <td>Tengo / Disponible</td><td>67–68</td>
+          <td>Verifica que lo que hay + lo que va a llegar alcance para el presupuesto.</td>
+          <td>Validador "Disponible" mensual</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Las dos fórmulas que sostienen todo</h3>
+    <div class="formula-box">
+      neto(semana)  =  Σ liquidez + Σ patrimonio − Σ deudas<br>
+      gasto_semana  =  neto(semana anterior) + ingresos de la semana − neto(semana actual)
+    </div>
+    <div class="callout">
+      <div class="icon">💡</div>
+      <div><strong>El truco de reconciliación es el corazón del sistema:</strong> no se anota cada
+      gasto pequeño (transporte, comidas, salidas). Se calcula el patrimonio al final de la semana y
+      la diferencia contra la semana anterior <em>es</em> el gasto. Ese mecanismo es el foco del MVP.</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>4. Fases del proyecto</h2>
+    <p>
+      El proyecto se construye de forma incremental. La <strong>Fase 1 es el MVP</strong>: valida el
+      mecanismo más valioso (la reconciliación) desplegado de punta a punta. Nada de las fases
+      siguientes se empieza hasta que el MVP funcione con datos reales.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Fase</th><th>Alcance</th><th>HUs</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>F0 · Fundaciones</strong></td><td>Proyecto, base de datos en la nube y deploy.</td><td>HU-001 a HU-002</td><td><span class="estado encurso">En curso</span></td></tr>
+        <tr><td><strong>F1 · MVP — Balance semanal</strong></td><td>Cuentas, saldos por semana, neto y gasto por reconciliación.</td><td>HU-003 a HU-009</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+        <tr><td><strong>F2 · Registro desde el celular</strong></td><td>Anotar gastos con categoría e ingresos durante la semana.</td><td>HU-010 a HU-011</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+        <tr><td><strong>F3 · Presupuesto mensual</strong></td><td>Plantilla por defecto, Plan vs Gasto, Por pagar con arrastre.</td><td>HU-012 a HU-014</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+        <tr><td><strong>F4 · Me debo</strong></td><td>Estacionar gastos futuros y promoverlos al presupuesto.</td><td>HU-015 a HU-016</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+        <tr><td><strong>F5 · Validadores</strong></td><td>Validador semanal y Disponible mensual automáticos.</td><td>HU-017 a HU-018</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+        <tr><td><strong>F6 · Historia y análisis</strong></td><td>Import del Excel, dashboards, proyecciones.</td><td>HU-019 a HU-021</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+        <tr><td><strong>F7 · Seguridad</strong></td><td>Login y Row Level Security.</td><td>HU-022</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>5. Tablero de seguimiento</h2>
+    <p>
+      Estado global: <strong>22 historias</strong> · <strong>0 completadas</strong> ·
+      <strong>1 en curso</strong> · <strong>21 pendientes</strong>.
+      (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
+    </p>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Historia</th><th>Fase</th><th>Estado</th><th>Fecha</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>HU-001</code></td><td>Proyecto conectado a base de datos en la nube</td><td>F0</td><td><span class="estado encurso">En curso</span></td><td>17 jul 2026</td></tr>
+        <tr><td><code>HU-002</code></td><td>App publicada en una URL (deploy automático)</td><td>F0</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-003</code></td><td>Definir agrupadores del balance</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-004</code></td><td>Definir ítems dentro de cada agrupador</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-005</code></td><td>Crear y seleccionar la semana</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-006</code></td><td>Registrar saldos con input-calculadora</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-007</code></td><td>Ver el patrimonio neto de la semana</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-008</code></td><td>Gasto de la semana calculado automáticamente</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-009</code></td><td>Historial de semanas</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-010</code></td><td>Anotar un gasto desde el celular</td><td>F2</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-011</code></td><td>Registrar ingresos</td><td>F2</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-012</code></td><td>Categorías con plantilla por defecto</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-013</code></td><td>Armar el presupuesto del mes</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-014</code></td><td>Plan vs Gasto vs Por pagar con arrastre</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-015</code></td><td>Estacionar un gasto futuro (Me debo)</td><td>F4</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-016</code></td><td>Promover un Me debo al presupuesto</td><td>F4</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-017</code></td><td>Validador de consistencia semanal</td><td>F5</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-018</code></td><td>Disponible mensual (solvencia)</td><td>F5</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-019</code></td><td>Importar el histórico del Excel</td><td>F6</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-020</code></td><td>Dashboard de evolución</td><td>F6</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-021</code></td><td>Supuestos y proyecciones simples</td><td>F6</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-022</code></td><td>Login y protección de los datos</td><td>F7</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>6. Fase 0 — Fundaciones</h2>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-001 · Proyecto conectado a base de datos en la nube</h3>
+        <span class="estado encurso">En curso</span>
+      </div>
+      <div class="historia">Como usuario quiero que mis datos vivan en la nube para poder
+        registrarlos desde el celular y consolidarlos desde el computador, sin depender de un
+        archivo local.</div>
+      <ul class="lista">
+        <li>Proyecto Vite + React + TypeScript creado, con repositorio en GitHub.</li>
+        <li>Proyecto Supabase creado con las 5 tablas del MVP: <code>meses</code>,
+          <code>semanas</code>, <code>agrupadores</code>, <code>items_balance</code>,
+          <code>saldos_semana</code>.</li>
+        <li>La URL y la <code>anon key</code> de Supabase están en <code>.env</code>, y
+          <code>.env</code> está en <code>.gitignore</code> (nunca credenciales en el repo).</li>
+        <li>La app se conecta a Supabase y puede leer y escribir un registro de prueba.</li>
+      </ul>
+      <p><strong>Avance (17 jul 2026):</strong> repo Git local inicializado (rama
+        <code>main</code>) con <code>.gitignore</code> que excluye el Excel, los CSV, los backups
+        y el <code>.env</code> — verificado con <code>git check-ignore</code>. Plantilla
+        <code>.env.example</code> creada. Falta: proyecto Vite, tablas en Supabase y conexión.</p>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-002 · App publicada en una URL (deploy automático)</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero abrir la app desde una URL pública en cualquier
+        dispositivo, para usarla en el celular durante la semana y en el computador el fin de
+        semana.</div>
+      <ul class="lista">
+        <li>Repositorio conectado a Netlify; cada push a la rama principal publica solo.</li>
+        <li>Variables de entorno de Supabase configuradas en Netlify (no en el código).</li>
+        <li>La URL abre y funciona en el navegador del celular y del computador.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>7. Fase 1 — MVP: balance semanal y gasto por reconciliación</h2>
+
+    <div class="callout">
+      <div class="icon">🎯</div>
+      <div><strong>Criterio de aceptación del MVP:</strong> "Puedo definir mis cuentas (agrupadores
+      + ítems), ingresar los saldos de dos semanas seguidas, y la app me muestra mi patrimonio neto
+      y calcula solo cuánto gasté en la semana como la diferencia — todo funcionando en una URL
+      pública de Netlify, con los datos guardados en Supabase."</div>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-003 · Definir agrupadores del balance</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero crear mis agrupadores de cuentas con su tipo
+        (liquidez / patrimonio / deuda), para replicar los grupos que hoy tengo en el Excel:
+        Tarjeta, Efectivo y Nequi, Me debo, Me deben, Apto, Fondo inversión, Fondo libertad,
+        Carlos/OTH, Rappi, Occidente, Debo.</div>
+      <ul class="lista">
+        <li>Puedo crear, editar, reordenar y eliminar agrupadores.</li>
+        <li>Cada agrupador tiene nombre y tipo obligatorio: liquidez, patrimonio o deuda.</li>
+        <li>El orden que defino es el orden en que los veo en el balance.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-004 · Definir ítems dentro de cada agrupador</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero desglosar cada agrupador en ítems (ej. "Tarjeta"
+        contiene "Débito Bancolombia" y "CDT cajita"), para guardar el detalle sin perder la vista
+        simple por agrupador.</div>
+      <ul class="lista">
+        <li>Puedo crear, editar, reordenar y eliminar ítems dentro de un agrupador.</li>
+        <li>En el balance veo el <strong>total del agrupador</strong> (como en el Excel); el
+          detalle por ítem se ve al expandirlo.</li>
+        <li>Un agrupador simple puede tener un solo ítem sin fricción extra.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-005 · Crear y seleccionar la semana</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero crear la semana en la que voy a registrar saldos
+        (ej. "27 abr - 3 may"), para que cada registro quede asociado a su semana y su mes.</div>
+      <ul class="lista">
+        <li>Cada semana pertenece a un mes; si el mes no existe, se crea sin pasos extra.</li>
+        <li>La app sugiere la semana siguiente automáticamente (rango consecutivo a la última).</li>
+        <li>No se pueden crear semanas duplicadas; siempre es claro cuál es la semana activa.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-006 · Registrar saldos con input-calculadora</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero ingresar el saldo de cada ítem escribiendo
+        operaciones como en Excel (<code>60000 + 20000</code> guarda <code>80000</code>), para no
+        tener que sacar la calculadora aparte.</div>
+      <ul class="lista">
+        <li>Todos los campos de monto aceptan expresiones con <code>+ − × ÷ ( ) .</code></li>
+        <li>La expresión se sanitiza (solo dígitos, operadores y paréntesis) y se evalúa de forma
+          segura al confirmar — nunca <code>eval</code> directo sobre el texto.</li>
+        <li>Se guarda el resultado numérico; si la expresión es inválida, error claro sin perder
+          lo escrito.</li>
+        <li>Los saldos de la semana anterior vienen <strong>precargados</strong> como punto de
+          partida (la mayoría de cuentas cambia poco semana a semana).</li>
+        <li>Los montos se muestran en formato COP con separador de miles.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-007 · Ver el patrimonio neto de la semana</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero ver el neto de la semana (lo que tengo menos lo que
+        debo) apenas termino de ingresar los saldos, como la fila TOTAL del Excel.</div>
+      <ul class="lista">
+        <li>Neto = Σ liquidez + Σ patrimonio − Σ deudas, calculado en vivo.</li>
+        <li>Se ven los subtotales por tipo (tengo / debo) y el total por agrupador.</li>
+        <li>El neto nunca se almacena: siempre se calcula desde los saldos.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-008 · Gasto de la semana calculado automáticamente</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero que la app calcule sola cuánto gasté en la semana
+        como la diferencia de neto contra la semana anterior, para no cuadrar más ese número a mano
+        (la fila DIFERENCIA del Excel).</div>
+      <ul class="lista">
+        <li>Gasto de la semana = neto(semana anterior) − neto(semana actual). Cuando existan
+          ingresos (HU-011), la fórmula pasa a: neto anterior + ingresos − neto actual.</li>
+        <li>El gasto se muestra junto al neto en la pantalla de la semana.</li>
+        <li>Si es la primera semana registrada, se indica que no hay contra qué comparar.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-009 · Historial de semanas</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero ver la lista de semanas con su neto y su gasto
+        calculado, para seguir mi evolución y volver a cualquier semana a corregir un saldo.</div>
+      <ul class="lista">
+        <li>Lista de semanas en orden cronológico con rango, neto y gasto de cada una.</li>
+        <li>Puedo abrir cualquier semana para ver o editar sus saldos.</li>
+        <li>Al corregir un saldo pasado, el gasto de esa semana y de la siguiente se recalculan.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>8. Fase 2 — Registro desde el celular</h2>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-010 · Anotar un gasto desde el celular</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero anotar en el momento los gastos que tienen categoría
+        del presupuesto (mercado, Claude, salud…), para no perderlos hasta la consolidación de fin
+        de mes. Los gastos sin categoría no se anotan — los captura la reconciliación.</div>
+      <ul class="lista">
+        <li>Formulario rápido: monto (con calculadora), categoría, descripción opcional, fecha.</li>
+        <li>El gasto queda en <code>movimientos</code>, asociado a la semana correspondiente.</li>
+        <li>Cómodo en pantalla de celular: pocos taps, sin scroll innecesario.</li>
+        <li>Veo la lista de lo anotado en la semana y puedo corregir o borrar.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-011 · Registrar ingresos</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero registrar los ingresos con su nombre (INT, Prima,
+        Arriendo, Cesantías…) en la semana en que caen, para que la reconciliación semanal y el
+        presupuesto mensual los tengan en cuenta.</div>
+      <ul class="lista">
+        <li>Ingreso con nombre y monto (con calculadora), asociado a semana y mes.</li>
+        <li>El gasto semanal pasa a calcularse con la fórmula completa:
+          neto anterior + ingresos de la semana − neto actual.</li>
+        <li>El total de ingresos del mes queda disponible para el presupuesto (F3) y el
+          Disponible (F5).</li>
+        <li><strong>Pregunta abierta a resolver aquí:</strong> manejo exacto de un ingreso que
+          entra a mitad de semana en la fórmula de reconciliación.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>9. Fase 3 — Presupuesto mensual</h2>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-012 · Categorías con plantilla por defecto</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero un presupuesto por defecto editable (mis categorías
+        con su monto usual: Cel, Mercado, Salud, Smart, Apto…), para que cada mes arranque
+        prellenado y no de cero.</div>
+      <ul class="lista">
+        <li>CRUD de categorías: nombre, grupo (fijos / inversión / otros), monto por defecto,
+          activa/inactiva y orden.</li>
+        <li>Al crear un mes, el presupuesto arranca con la plantilla; se puede ajustar ese mes
+          sin tocar la plantilla.</li>
+        <li>Desactivar una categoría no borra su historia.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-013 · Armar el presupuesto del mes</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero asignar el Plan de cada categoría hasta cuadrarlo
+        con los ingresos del mes, y poder redistribuir si entra un ingreso nuevo.</div>
+      <ul class="lista">
+        <li>Monto Plan por categoría, con input-calculadora.</li>
+        <li>La app muestra en vivo: Σ planes vs ingresos del mes, y la diferencia por asignar.</li>
+        <li>Señal visual clara cuando el presupuesto no cuadra con los ingresos.</li>
+        <li>Si entra un ingreso nuevo a mitad de mes, puedo modificarlo y redistribuir.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-014 · Plan vs Gasto vs Por pagar con arrastre</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero ver por categoría el Plan, lo gastado y el Por
+        pagar — con el saldo del mes anterior arrastrado automáticamente (la columna "Plan + mes
+        ant" del Excel) — para saber cuánto queda de cada cosa sin copiar columnas.</div>
+      <ul class="lista">
+        <li>Gasto por categoría = Σ movimientos de esa categoría en el mes (se calcula, no se
+          almacena).</li>
+        <li>Por pagar = Plan + saldo del mes anterior − Gasto (se calcula, no se almacena).</li>
+        <li>El Por pagar de un mes aparece automáticamente como saldo inicial del siguiente.</li>
+        <li>La vista replica las 4 columnas del Excel: Plan · Plan + mes ant · Gasto · Por pagar.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>10. Fase 4 — Me debo (estacionamiento de gastos futuros)</h2>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-015 · Estacionar un gasto futuro (Me debo)</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero "parquear" algo que ya compré pero aún no
+        presupuesto para pagar (ej. una entrada de noviembre comprada hoy porque sale más barata),
+        para que no distorsione el mes actual ni se me olvide.</div>
+      <ul class="lista">
+        <li>Creo un Me debo con nombre, monto, fecha de compra y mes objetivo opcional.</li>
+        <li>Estado inicial: parqueado. Veo la lista de parqueados con su total en todo momento.</li>
+        <li>El total de parqueados se refleja en la línea "Me debo" del balance de liquidez.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-016 · Promover un Me debo al presupuesto</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero "sacar" un ítem parqueado el mes en que decido
+        pagarlo, para que aparezca como línea del presupuesto de ese mes (el "Me debo" del
+        presupuesto, que es opcional y solo existe cuando hay algo que pagar).</div>
+      <ul class="lista">
+        <li>Acción "pagar este mes": crea la línea en el presupuesto del mes elegido y la vincula
+          al Me debo original.</li>
+        <li>El estado del Me debo pasa a promovido, y a pagado cuando se ejecuta el pago.</li>
+        <li>Un Me debo no puede promoverse dos veces.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>11. Fase 5 — Validadores</h2>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-017 · Validador de consistencia semanal</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero que la app verifique sola que la diferencia de
+        patrimonio entre semanas cuadre con lo registrado (la fila VALIDADOR del Excel), para
+        detectar de inmediato si me equivoqué anotando un saldo o un gasto.</div>
+      <ul class="lista">
+        <li>Por cada semana: valida que gasto registrado == neto anterior + ingresos − neto
+          actual.</li>
+        <li>Resultado visible en la semana y en el historial: cuadra ✓ / no cuadra ✗ con la
+          diferencia exacta.</li>
+        <li>Un descuadre señala error de anotación — el mensaje orienta qué revisar (saldos,
+          ingresos o movimientos).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-018 · Disponible mensual (solvencia)</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero ver si lo que tengo más lo que me va a llegar en el
+        mes alcanza para pagar el presupuesto (el "Tengo / Disponible" del Excel), para saber cuándo
+        toca reasignar.</div>
+      <ul class="lista">
+        <li>Disponible = (liquidez actual + Σ ingresos del mes) − Σ Plan del presupuesto.</li>
+        <li>Visible al armar y al consultar el presupuesto del mes.</li>
+        <li>Un Disponible negativo <strong>no es un error</strong>: es la señal deseada de que hay
+          que cuadrar/reasignar el presupuesto.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>12. Fase 6 — Historia y análisis</h2>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-019 · Importar el histórico del Excel</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero traer el histórico de mi Excel a la app, para que
+        los dashboards y proyecciones tengan toda la historia y no arranquen de cero.</div>
+      <ul class="lista">
+        <li>Import por CSV directo a Supabase — <strong>nunca</strong> pasando datos reales por el
+          repositorio.</li>
+        <li>Trae meses, semanas y saldos históricos; los netos y gastos calculados se verifican
+          contra los totales del Excel en varias semanas al azar.</li>
+        <li>Definir aquí el formato exacto del CSV (pregunta abierta del brief).</li>
+        <li>Se puede exportar un backup en CSV en cualquier momento.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-020 · Dashboard de evolución</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero ver gráficas de la evolución de mi patrimonio, de mi
+        gasto semanal y de la composición de mis cuentas, para hacer seguimiento sin armar nada a
+        mano — este es el premio de tener la data ordenada.</div>
+      <ul class="lista">
+        <li>Evolución del neto semana a semana.</li>
+        <li>Gasto semanal en el tiempo (con su promedio).</li>
+        <li>Composición del balance por agrupador y por tipo (tengo / debo).</li>
+        <li>Plan vs Gasto por categoría en el mes.</li>
+        <li>Cero configuración: se abre y se ve.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-021 · Supuestos y proyecciones simples</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero proyectar mi patrimonio a futuro con supuestos
+        simples (ej. "si mantengo mi gasto promedio, ¿dónde estoy en 6 meses?"), para tomar
+        decisiones con números y no con intuición.</div>
+      <ul class="lista">
+        <li>Proyección del neto a N meses usando promedios de gasto e ingreso del histórico.</li>
+        <li>Escenarios básicos: ajustar el gasto semanal objetivo o un ingreso y ver el efecto.</li>
+        <li>Deliberadamente simple: si requiere manual de uso, no va.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>13. Fase 7 — Seguridad</h2>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-022 · Login y protección de los datos</h3>
+        <span class="estado pendiente">Pendiente</span>
+      </div>
+      <div class="historia">Como usuario quiero que solo yo pueda ver mis finanzas, porque la app
+        vive en una URL pública y son datos sensibles.</div>
+      <ul class="lista">
+        <li>Autenticación con Supabase Auth (un solo usuario: yo).</li>
+        <li>Row Level Security activado: columna <code>user_id</code> en las tablas y políticas
+          por usuario.</li>
+        <li>Sin sesión iniciada, la URL pública no muestra ningún dato.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>14. Cómo usamos este documento</h2>
+    <ul class="lista">
+      <li>Al <strong>empezar</strong> una HU: su estado pasa a
+        <span class="estado encurso">En curso</span> (en la tarjeta, en el tablero de la sección 5
+        y en la tabla de fases).</li>
+      <li>Al <strong>completar</strong> una HU: estado
+        <span class="estado completada">Completada</span> + fecha, y una línea corta en la tarjeta
+        con qué se verificó (ej. "probado con 2 semanas reales en la URL de Netlify").</li>
+      <li>Una HU se completa solo cuando cumple <strong>todos</strong> sus criterios de aceptación
+        funcionando en la app desplegada — no en el computador local.</li>
+      <li>Si una HU se <strong>descarta</strong> o cambia: estado
+        <span class="estado descartada">Descartada</span> con el porqué (no se borra, para no
+        perder la decisión).</li>
+      <li>Las HUs nuevas se agregan al final de su fase con el siguiente ID libre
+        (<code>HU-023</code> en adelante) y se suman al tablero.</li>
+      <li>El contador de la sección 5 se actualiza en cada cambio de estado.</li>
+    </ul>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>15. El flujo completo, de punta a punta</h2>
+    <div class="diagrama">
+<span class="hl3">DURANTE LA SEMANA (celular)</span><br>
+  gasto con categoría (mercado, salud, Claude…)  →  <span class="hl">movimientos</span>  <span class="hl2">[HU-010]</span><br>
+  gastos sin categoría (transporte, salidas…)    →  no se anotan ✋<br>
+<br>
+<span class="hl3">FIN DE SEMANA (computador)</span><br>
+  saldos por ítem <span class="hl2">[HU-006]</span>  →  neto = tengo − debo <span class="hl2">[HU-007]</span><br>
+  gasto_semana = neto_ant + ingresos − neto_act  <span class="hl2">[HU-008]</span>  ← <span class="hl">la reconciliación</span><br>
+  VALIDADOR: ¿cuadra todo?  ✓ / ✗  <span class="hl2">[HU-017]</span><br>
+<br>
+<span class="hl3">FIN DE MES (computador)</span><br>
+  presupuesto: Plan por categoría (desde plantilla) <span class="hl2">[HU-012, HU-013]</span><br>
+  Plan · Plan + mes ant · Gasto · <span class="hl">Por pagar</span>  →  se arrastra al mes siguiente <span class="hl2">[HU-014]</span><br>
+  Me debo parqueados  →  se promueven cuando toca pagarlos <span class="hl2">[HU-015, HU-016]</span><br>
+  DISPONIBLE: ¿alcanza? (negativo = reasignar) <span class="hl2">[HU-018]</span><br>
+<br>
+<span class="hl3">SIEMPRE</span><br>
+  historial <span class="hl2">[HU-009]</span>  →  dashboards <span class="hl2">[HU-020]</span>  →  proyecciones <span class="hl2">[HU-021]</span>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
