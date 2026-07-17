@@ -1,0 +1,19 @@
+# Configuracion de build para Netlify.
+# Las credenciales (VITE_SUPABASE_*) NO van aqui: se configuran en el panel de
+# Netlify (Site settings > Environment variables), igual que el .env local,
+# para no subirlas al repositorio.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Vite 8 requiere Node moderno; fijamos la version para que el build no falle.
+  NODE_VERSION = "22"
+
+# App de una sola pagina: cualquier ruta cae en index.html
+# (util cuando agreguemos navegacion interna; evita errores 404 al recargar).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
