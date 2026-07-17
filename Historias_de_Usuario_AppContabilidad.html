@@ -248,8 +248,8 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
   <section>
     <h2>5. Tablero de seguimiento</h2>
     <p>
-      Estado global: <strong>22 historias</strong> · <strong>2 completadas</strong> ·
-      <strong>1 en curso</strong> · <strong>19 pendientes</strong>.
+      Estado global: <strong>22 historias</strong> · <strong>3 completadas</strong> ·
+      <strong>1 en curso</strong> · <strong>18 pendientes</strong>.
       (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
     </p>
     <table>
@@ -259,8 +259,8 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
       <tbody>
         <tr><td><code>HU-001</code></td><td>Proyecto conectado a base de datos en la nube</td><td>F0</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-002</code></td><td>App publicada en una URL (deploy automático)</td><td>F0</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
-        <tr><td><code>HU-003</code></td><td>Definir agrupadores del balance</td><td>F1</td><td><span class="estado encurso">En curso</span></td><td>17 jul 2026</td></tr>
-        <tr><td><code>HU-004</code></td><td>Definir ítems dentro de cada agrupador</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-003</code></td><td>Definir agrupadores del balance</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
+        <tr><td><code>HU-004</code></td><td>Definir ítems dentro de cada agrupador</td><td>F1</td><td><span class="estado encurso">En curso</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-005</code></td><td>Crear y seleccionar la semana</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-006</code></td><td>Registrar saldos con input-calculadora</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-007</code></td><td>Ver el patrimonio neto de la semana</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
@@ -365,7 +365,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
     <div class="card">
       <div class="hu-head">
         <h3>HU-003 · Definir agrupadores del balance</h3>
-        <span class="estado encurso">En curso</span>
+        <span class="estado completada">Completada · 17 jul 2026</span>
       </div>
       <div class="historia">Como usuario quiero crear mis agrupadores de cuentas con su tipo
         (liquidez / patrimonio / deuda), para replicar los grupos que hoy tengo en el Excel:
@@ -376,12 +376,18 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li>Cada agrupador tiene nombre y tipo obligatorio: liquidez, patrimonio o deuda.</li>
         <li>El orden que defino es el orden en que los veo en el balance.</li>
       </ul>
+      <p><strong>Completada (17 jul 2026).</strong> Pantalla de Configuración con CRUD de
+        agrupadores (crear, editar, reordenar con ↑↓, eliminar) y tipo con distintivo de color por
+        liquidez / patrimonio / deuda. Verificado: build sin errores de tipos, CRUD + reordenamiento
+        probados contra la base real, y desplegado en
+        <a href="https://contabilidap.netlify.app">contabilidap.netlify.app</a> — confirmado en el
+        sitio por el usuario.</p>
     </div>
 
     <div class="card">
       <div class="hu-head">
         <h3>HU-004 · Definir ítems dentro de cada agrupador</h3>
-        <span class="estado pendiente">Pendiente</span>
+        <span class="estado encurso">En curso</span>
       </div>
       <div class="historia">Como usuario quiero desglosar cada agrupador en ítems (ej. "Tarjeta"
         contiene "Débito Bancolombia" y "CDT cajita"), para guardar el detalle sin perder la vista

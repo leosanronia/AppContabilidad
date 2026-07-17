@@ -90,6 +90,11 @@ code {
   color: var(--texto);
 }
 
+.input-sm {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+}
+
 .form-nuevo .input:first-child {
   flex: 1 1 200px;
 }
@@ -102,6 +107,11 @@ code {
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.82rem;
 }
 
 .btn:disabled {
@@ -137,6 +147,12 @@ code {
   color: var(--subtexto);
 }
 
+.btn-icono-sm {
+  width: 28px;
+  height: 28px;
+  font-size: 0.85rem;
+}
+
 .btn-icono:disabled {
   opacity: 0.35;
   cursor: not-allowed;
@@ -148,21 +164,45 @@ code {
   margin: 0;
 }
 
-.fila {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 0;
+/* ---------- agrupador (tarjeta expandible) ---------- */
+.agrup-card {
   border-bottom: 1px solid var(--linea-suave);
 }
 
-.fila:last-child {
+.agrup-card:last-child {
   border-bottom: none;
+}
+
+.agrup-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0;
+}
+
+.expandir {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--subtexto);
+  font-size: 0.9rem;
+  padding: 2px 4px;
+  line-height: 1;
 }
 
 .fila-nombre {
   font-weight: 600;
   flex: 1 1 auto;
+}
+
+.nombre-clic {
+  cursor: pointer;
+}
+
+.item-count {
+  font-size: 0.78rem;
+  color: var(--subtexto);
+  white-space: nowrap;
 }
 
 .fila-acciones {
@@ -178,12 +218,63 @@ code {
   flex-wrap: wrap;
   width: 100%;
   align-items: center;
+  padding: 0.75rem 0;
 }
 
 .fila-edicion .input:first-child {
   flex: 1 1 160px;
 }
 
+/* ---------- panel de items (bajo un agrupador) ---------- */
+.items-panel {
+  margin: 0 0 0.75rem 1.75rem;
+  padding: 0.75rem 0.9rem;
+  background: #f8fafc;
+  border: 1px solid var(--linea-suave);
+  border-radius: 8px;
+}
+
+.items-vacio {
+  color: var(--subtexto);
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem;
+}
+
+.items-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.6rem;
+}
+
+.item-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--linea-suave);
+}
+
+.item-fila:last-child {
+  border-bottom: none;
+}
+
+.item-nombre {
+  flex: 1 1 auto;
+  font-size: 0.92rem;
+}
+
+.item-form {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.item-form .input {
+  flex: 1 1 180px;
+}
+
+/* ---------- distintivos de tipo ---------- */
 .badge {
   font-size: 11px;
   font-weight: 700;
@@ -209,6 +300,7 @@ code {
   color: #b5342b;
 }
 
+/* ---------- avisos ---------- */
 .aviso {
   color: var(--subtexto);
   font-size: 0.9rem;

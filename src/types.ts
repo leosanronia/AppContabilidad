@@ -9,6 +9,13 @@ export interface Agrupador {
   orden: number
 }
 
+export interface ItemBalance {
+  id: number
+  agrupador_id: number
+  nombre: string
+  orden: number
+}
+
 // Etiquetas legibles para mostrar en la interfaz.
 export const TIPOS: { valor: TipoAgrupador; etiqueta: string }[] = [
   { valor: 'liquidez', etiqueta: 'Liquidez' },
