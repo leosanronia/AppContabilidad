@@ -1,0 +1,135 @@
+============================================================
+ PROGRAMAS PARA EL PROYECTO — App de finanzas personales
+ Generado el 17 jul 2026 · Actualizado el 17 jul 2026
+============================================================
+
+Stack del proyecto: React + Vite + TypeScript (frontend),
+Supabase (base de datos en la nube), GitHub (repositorio),
+Netlify (hosting). Casi todo es gratis y en la nube; en el
+PC solo hace falta poco.
+
+>>> NOVEDAD: NO se necesitó permiso de administrador. <<<
+Todo se instaló con SCOOP, un gestor de paquetes que
+instala en tu carpeta de usuario (C:\Users\itia200225\scoop)
+sin pedir administrador. Ver sección 0.
+
+Leyenda:  [INSTALADO] listo ✓   |   [PENDIENTE] aún no
+          [OPCIONAL] cuando quieras
+
+
+============================================================
+ 0. SCOOP — el gestor que usamos (sin administrador)
+============================================================
+
+[INSTALADO]  Scoop 0.5.3
+         Qué es:  Un instalador de herramientas para Windows
+                  que NO requiere administrador. Guarda todo
+                  en C:\Users\itia200225\scoop y agrega los
+                  programas a tu PATH de usuario.
+         Con él se instaló todo lo de abajo. Comandos útiles:
+                  scoop list              (ver lo instalado)
+                  scoop update *          (actualizar todo)
+                  scoop install <nombre>  (instalar algo)
+
+
+============================================================
+ 1. OBLIGATORIO PARA EL FRONTEND
+============================================================
+
+[INSTALADO]  Node.js 24.18.0  (+ npm 11.16.0)   ✓
+         Qué es:  El motor que ejecuta el frontend (Vite +
+                  React). "npm" instala las librerías.
+         Instalado con:  scoop install nodejs-lts
+         Verificar (terminal nueva):  node -v   /   npm -v
+
+
+============================================================
+ 2. OBLIGATORIO — YA LO TENÍAS DE ANTES ✓
+============================================================
+
+[INSTALADO]  Git 2.46.0        (control de versiones)
+[INSTALADO]  Visual Studio Code (editor de código)
+
+
+============================================================
+ 3. CLI DE SERVICIOS — INSTALADOS ✓
+============================================================
+
+[INSTALADO]  GitHub CLI (gh) 2.96.0
+         Para qué: crear el repositorio de GitHub, subir el
+                  código y abrir pull requests desde la
+                  terminal.
+         Instalado con:  scoop install gh
+         PENDIENTE: iniciar sesión ->  gh auth login
+                  (ese paso lo haces tú una vez; abre el
+                  navegador para autenticar tu cuenta).
+
+[INSTALADO]  Supabase CLI 2.109.1
+         Para qué: manejar la base de datos por migraciones
+                  versionadas en Git (crear/alterar tablas
+                  desde la terminal) y generar tipos de
+                  TypeScript.
+         Instalado con:  scoop install supabase
+         PENDIENTE: iniciar sesión ->  supabase login
+                  y luego enlazar el proyecto ->
+                  supabase link --project-ref ckedddrcuupzhxbdjyxu
+
+
+============================================================
+ 4. OPCIONAL — PROBABLEMENTE NO LO NECESITES (MVP)
+============================================================
+
+[OPCIONAL]  Netlify CLI
+         Para qué: desplegar desde la terminal. El despliegue
+                  de este proyecto es AUTOMÁTICO desde GitHub,
+                  así que NO hace falta. Si algún día se
+                  quiere: scoop install netlify-cli
+
+[OPCIONAL]  GitHub Desktop
+         Alternativa con ventanas a usar Git por terminal.
+         No hace falta: ya tienes Git y gh.
+
+
+============================================================
+ 5. YA INSTALADO Y ÚTIL (no lo quites)
+============================================================
+
+[INSTALADO]  Python 3.12.4
+         Se usó para leer tu Excel y podría servir para el
+         import del histórico más adelante.
+
+
+============================================================
+ 6. CUENTAS EN LA NUBE (no se "instalan", pero se necesitan)
+============================================================
+
+[YA LA TIENES]  Cuenta de Supabase
+         El proyecto y la base de datos ya están creados. ✓
+
+[REVISAR]  Cuenta de GitHub
+         Necesaria para guardar el repositorio.
+         Crear gratis en: https://github.com
+         (luego: gh auth login para conectarla)
+
+[REVISAR]  Cuenta de Netlify
+         Necesaria para publicar la app en una URL pública.
+         Registrarse CON la cuenta de GitHub (se conectan
+         solos para el despliegue). https://netlify.com
+
+
+============================================================
+ RESUMEN RÁPIDO
+============================================================
+
+  Instalado y listo (sin administrador):
+     -> Scoop, Node.js + npm, GitHub CLI, Supabase CLI
+     -> (ya tenías: Git, VSCode, Python)
+
+  Pendiente (lo haces tú, una vez):
+     -> gh auth login          (conectar tu GitHub)
+     -> supabase login + link  (conectar tu Supabase)
+
+  No hace falta:
+     -> Netlify CLI (deploy automático), GitHub Desktop
+
+============================================================

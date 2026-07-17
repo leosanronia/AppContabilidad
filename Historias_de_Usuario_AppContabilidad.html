@@ -248,8 +248,8 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
   <section>
     <h2>5. Tablero de seguimiento</h2>
     <p>
-      Estado global: <strong>22 historias</strong> · <strong>0 completadas</strong> ·
-      <strong>1 en curso</strong> · <strong>21 pendientes</strong>.
+      Estado global: <strong>22 historias</strong> · <strong>1 completada</strong> ·
+      <strong>0 en curso</strong> · <strong>21 pendientes</strong>.
       (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
     </p>
     <table>
@@ -257,7 +257,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <tr><th>ID</th><th>Historia</th><th>Fase</th><th>Estado</th><th>Fecha</th></tr>
       </thead>
       <tbody>
-        <tr><td><code>HU-001</code></td><td>Proyecto conectado a base de datos en la nube</td><td>F0</td><td><span class="estado encurso">En curso</span></td><td>17 jul 2026</td></tr>
+        <tr><td><code>HU-001</code></td><td>Proyecto conectado a base de datos en la nube</td><td>F0</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-002</code></td><td>App publicada en una URL (deploy automático)</td><td>F0</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-003</code></td><td>Definir agrupadores del balance</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-004</code></td><td>Definir ítems dentro de cada agrupador</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
@@ -290,7 +290,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
     <div class="card">
       <div class="hu-head">
         <h3>HU-001 · Proyecto conectado a base de datos en la nube</h3>
-        <span class="estado encurso">En curso</span>
+        <span class="estado completada">Completada · 17 jul 2026</span>
       </div>
       <div class="historia">Como usuario quiero que mis datos vivan en la nube para poder
         registrarlos desde el celular y consolidarlos desde el computador, sin depender de un
@@ -304,10 +304,27 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
           <code>.env</code> está en <code>.gitignore</code> (nunca credenciales en el repo).</li>
         <li>La app se conecta a Supabase y puede leer y escribir un registro de prueba.</li>
       </ul>
-      <p><strong>Avance (17 jul 2026):</strong> repo Git local inicializado (rama
-        <code>main</code>) con <code>.gitignore</code> que excluye el Excel, los CSV, los backups
-        y el <code>.env</code> — verificado con <code>git check-ignore</code>. Plantilla
-        <code>.env.example</code> creada. Falta: proyecto Vite, tablas en Supabase y conexión.</p>
+      <p><strong>Completada (17 jul 2026).</strong> Verificado de punta a punta:</p>
+      <ul class="lista">
+        <li>Base Supabase con las <strong>5 tablas del MVP</strong>
+          (<code>supabase/schema_mvp.sql</code>), comprobadas por REST — HTTP 200 en las cinco.</li>
+        <li><code>.env</code> con URL + anon key, <strong>fuera del repo</strong> por
+          <code>.gitignore</code> (verificado con <code>git check-ignore</code>; el <code>.env</code>
+          nunca se commiteó, confirmado en el historial).</li>
+        <li>Proyecto <strong>Vite 8 + React 19 + TypeScript</strong> creado; cliente en
+          <code>src/supabaseClient.ts</code> que lee el <code>.env</code>; <code>npm run build</code>
+          compila sin errores de tipos.</li>
+        <li><strong>Lectura y escritura reales verificadas</strong> contra la base: se insertó un
+          agrupador de prueba, se leyó y se borró (tabla limpia).</li>
+        <li>Código en el repo de GitHub
+          <code>github.com/leosanronia/AppContabilidad</code>.</li>
+      </ul>
+      <p style="font-size:14px;"><strong>Herramientas:</strong> Node.js 24.18.0, npm 11.16.0,
+        GitHub CLI 2.96.0 y Supabase CLI 2.109.1, instaladas <strong>sin administrador</strong> vía
+        Scoop (ver <code>programas.txt</code>).</p>
+      <p style="color:var(--naranja);font-size:14px;"><strong>Nota de seguridad:</strong> sin RLS
+        todavía (HU-022), la <code>anon key</code> da lectura y escritura a cualquiera que la tenga.
+        OK para pruebas; activar RLS antes de cargar finanzas reales.</p>
     </div>
 
     <div class="card">
