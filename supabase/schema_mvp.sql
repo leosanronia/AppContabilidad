@@ -19,11 +19,16 @@ create table meses (
 create table semanas (
   id           bigint generated always as identity primary key,
   mes_id       bigint not null references meses(id) on delete cascade,
-  rango        text   not null,             -- "27 abr - 3 may"
+  rango        text   not null,             -- "27 abr - 3 may" (etiqueta visible)
   numero       int,                          -- orden dentro del mes
   gasto_semana numeric(14,2) default 0,      -- gasto no rastreado (el "plug")
+  fecha_inicio date,                          -- fechas reales: permiten ordenar y
+  fecha_fin    date,                          -- saber cual es la semana anterior
   created_at   timestamptz not null default now()
 );
+
+-- Evita semanas duplicadas (dos semanas que empiecen el mismo dia).
+create unique index uq_semanas_fecha_inicio on semanas(fecha_inicio);
 
 -- 3) Agrupadores: las "cuentas" que ve el usuario, con su tipo.
 create table agrupadores (

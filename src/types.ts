@@ -16,6 +16,23 @@ export interface ItemBalance {
   orden: number
 }
 
+export interface Mes {
+  id: number
+  nombre: string
+  anio: number
+}
+
+export interface Semana {
+  id: number
+  mes_id: number
+  rango: string
+  numero: number | null
+  gasto_semana: number | null
+  // Fechas reales en formato 'YYYY-MM-DD'.
+  fecha_inicio: string
+  fecha_fin: string
+}
+
 // Etiquetas legibles para mostrar en la interfaz.
 export const TIPOS: { valor: TipoAgrupador; etiqueta: string }[] = [
   { valor: 'liquidez', etiqueta: 'Liquidez' },
