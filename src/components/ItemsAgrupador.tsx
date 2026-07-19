@@ -14,6 +14,7 @@ export function ItemsAgrupador({ agrupadorId, items, onCambio }: Props) {
   const [nuevoNombre, setNuevoNombre] = useState('')
   const [editandoId, setEditandoId] = useState<number | null>(null)
   const [editNombre, setEditNombre] = useState('')
+  const [editNota, setEditNota] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -46,8 +47,9 @@ export function ItemsAgrupador({ agrupadorId, items, onCambio }: Props) {
     const nombre = editNombre.trim()
     if (!nombre || editandoId === null) return
     const id = editandoId
+    const nota = editNota.trim() === '' ? null : editNota.trim()
     correr(async () => {
-      await actualizarItem(id, { nombre })
+      await actualizarItem(id, { nombre, nota })
       setEditandoId(null)
     })
   }
@@ -92,6 +94,12 @@ export function ItemsAgrupador({ agrupadorId, items, onCambio }: Props) {
                     value={editNombre}
                     onChange={(e) => setEditNombre(e.target.value)}
                   />
+                  <input
+                    className="input input-sm nota-edit"
+                    placeholder="Nota (opcional)"
+                    value={editNota}
+                    onChange={(e) => setEditNota(e.target.value)}
+                  />
                   <button
                     className="btn btn-sm btn-primario"
                     onClick={guardarEdicion}
@@ -108,7 +116,14 @@ export function ItemsAgrupador({ agrupadorId, items, onCambio }: Props) {
                 </>
               ) : (
                 <>
-                  <span className="item-nombre">{it.nombre}</span>
+                  <span className="item-nombre">
+                    {it.nombre}
+                    {it.nota && (
+                      <span className="marca-nota" title={it.nota}>
+                        📝
+                      </span>
+                    )}
+                  </span>
                   <div className="fila-acciones">
                     <button
                       className="btn-icono btn-icono-sm"
@@ -131,6 +146,7 @@ export function ItemsAgrupador({ agrupadorId, items, onCambio }: Props) {
                       onClick={() => {
                         setEditandoId(it.id)
                         setEditNombre(it.nombre)
+                        setEditNota(it.nota ?? '')
                       }}
                       disabled={ocupado}
                     >

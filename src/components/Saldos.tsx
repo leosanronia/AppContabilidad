@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Agrupador, ItemBalance, Semana } from '../types'
 import { etiquetaTipo } from '../types'
 import { listarAgrupadores } from '../api/agrupadores'
-import { listarItems } from '../api/items'
+import { actualizarItem, listarItems } from '../api/items'
 import { copiarSaldos, guardarSaldo, listarSaldosDeSemana } from '../api/saldos'
 import { evaluarMonto } from '../utils/calculadora'
 import { formatearCOP } from '../utils/moneda'
@@ -22,6 +22,9 @@ export function Saldos({ semana, semanaAnterior }: Props) {
   const [errores, setErrores] = useState<Record<number, string>>({})
   // Agrupadores contraidos (por defecto se ven expandidos para poder capturar).
   const [contraidos, setContraidos] = useState<Set<number>>(new Set())
+  // Nota abierta: solo una a la vez, y nunca visible por defecto.
+  const [notaAbierta, setNotaAbierta] = useState<number | null>(null)
+  const [notaTexto, setNotaTexto] = useState('')
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
@@ -104,6 +107,37 @@ export function Saldos({ semana, semanaAnterior }: Props) {
         await guardarSaldo(itemId, semana.id, valor)
         setSaldos((p) => ({ ...p, [itemId]: valor }))
         setTextos((p) => ({ ...p, [itemId]: String(valor) }))
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e))
+      } finally {
+        setOcupado(false)
+      }
+    })()
+  }
+
+  function alternarNota(item: ItemBalance) {
+    if (notaAbierta === item.id) {
+      setNotaAbierta(null)
+      return
+    }
+    setNotaAbierta(item.id)
+    setNotaTexto(item.nota ?? '')
+  }
+
+  // El texto se recibe explicito: setNotaTexto no se refleja de inmediato,
+  // asi que "Borrar nota" pasa '' directamente en vez de depender del estado.
+  function guardarNota(itemId: number, texto: string) {
+    const limpio = texto.trim()
+    const valor = limpio === '' ? null : limpio
+    setOcupado(true)
+    setError(null)
+    void (async () => {
+      try {
+        await actualizarItem(itemId, { nota: valor })
+        setItems((prev) =>
+          prev.map((i) => (i.id === itemId ? { ...i, nota: valor } : i)),
+        )
+        setNotaAbierta(null)
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e))
       } finally {
@@ -214,32 +248,79 @@ export function Saldos({ semana, semanaAnterior }: Props) {
 
               {abierto &&
                 susItems.map((it) => (
-                  <div className="saldo-fila" key={it.id}>
-                    <label className="saldo-nombre" htmlFor={`item-${it.id}`}>
-                      {it.nombre}
-                    </label>
-                    <input
-                      id={`item-${it.id}`}
-                      className={`input input-sm saldo-input ${
-                        errores[it.id] ? 'input-error' : ''
-                      }`}
-                      placeholder="0"
-                      value={textos[it.id] ?? ''}
-                      onChange={(e) =>
-                        setTextos((p) => ({ ...p, [it.id]: e.target.value }))
-                      }
-                      onBlur={() => confirmar(it.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') e.currentTarget.blur()
-                      }}
-                    />
-                    <span className="saldo-formateado">
-                      {saldos[it.id] !== undefined
-                        ? formatearCOP(saldos[it.id])
-                        : '—'}
-                    </span>
-                    {errores[it.id] && (
-                      <span className="saldo-error">{errores[it.id]}</span>
+                  <div className="saldo-bloque" key={it.id}>
+                    <div className="saldo-fila">
+                      <label className="saldo-nombre" htmlFor={`item-${it.id}`}>
+                        {it.nombre}
+                      </label>
+                      <input
+                        id={`item-${it.id}`}
+                        className={`input input-sm saldo-input ${
+                          errores[it.id] ? 'input-error' : ''
+                        }`}
+                        placeholder="0"
+                        value={textos[it.id] ?? ''}
+                        onChange={(e) =>
+                          setTextos((p) => ({ ...p, [it.id]: e.target.value }))
+                        }
+                        onBlur={() => confirmar(it.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') e.currentTarget.blur()
+                        }}
+                      />
+                      <span className="saldo-formateado">
+                        {saldos[it.id] !== undefined
+                          ? formatearCOP(saldos[it.id])
+                          : '—'}
+                      </span>
+                      <button
+                        type="button"
+                        className={`btn-nota ${it.nota ? 'btn-nota-con' : ''}`}
+                        onClick={() => alternarNota(it)}
+                        aria-expanded={notaAbierta === it.id}
+                        title={it.nota ? 'Ver o editar la nota' : 'Agregar una nota'}
+                      >
+                        📝
+                      </button>
+                      {errores[it.id] && (
+                        <span className="saldo-error">{errores[it.id]}</span>
+                      )}
+                    </div>
+
+                    {notaAbierta === it.id && (
+                      <div className="nota-panel">
+                        <textarea
+                          className="nota-texto"
+                          rows={3}
+                          placeholder="Escribe una nota para recordar algo de este ítem…"
+                          value={notaTexto}
+                          onChange={(e) => setNotaTexto(e.target.value)}
+                        />
+                        <div className="nota-acciones">
+                          <button
+                            className="btn btn-sm btn-primario"
+                            onClick={() => guardarNota(it.id, notaTexto)}
+                            disabled={ocupado}
+                          >
+                            Guardar nota
+                          </button>
+                          <button
+                            className="btn btn-sm btn-ghost"
+                            onClick={() => setNotaAbierta(null)}
+                          >
+                            Cancelar
+                          </button>
+                          {it.nota && (
+                            <button
+                              className="btn btn-sm btn-peligro"
+                              onClick={() => guardarNota(it.id, '')}
+                              disabled={ocupado}
+                            >
+                              Borrar nota
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
                 ))}

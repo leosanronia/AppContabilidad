@@ -233,7 +233,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
       </thead>
       <tbody>
         <tr><td><strong>F0 · Fundaciones</strong></td><td>Proyecto, base de datos en la nube y deploy.</td><td>HU-001 a HU-002</td><td><span class="estado completada">Completada</span></td></tr>
-        <tr><td><strong>F1 · MVP — Balance semanal</strong></td><td>Cuentas, saldos por semana, neto y gasto por reconciliación.</td><td>HU-003 a HU-009</td><td><span class="estado encurso">En curso</span></td></tr>
+        <tr><td><strong>F1 · MVP — Balance semanal</strong></td><td>Cuentas, saldos por semana, neto y gasto por reconciliación.</td><td>HU-003 a HU-009, HU-023</td><td><span class="estado encurso">En curso</span></td></tr>
         <tr><td><strong>F2 · Registro desde el celular</strong></td><td>Anotar gastos con categoría e ingresos durante la semana.</td><td>HU-010 a HU-011</td><td><span class="estado pendiente">Pendiente</span></td></tr>
         <tr><td><strong>F3 · Presupuesto mensual</strong></td><td>Plantilla por defecto, Plan vs Gasto, Por pagar con arrastre.</td><td>HU-012 a HU-014</td><td><span class="estado pendiente">Pendiente</span></td></tr>
         <tr><td><strong>F4 · Me debo</strong></td><td>Estacionar gastos futuros y promoverlos al presupuesto.</td><td>HU-015 a HU-016</td><td><span class="estado pendiente">Pendiente</span></td></tr>
@@ -248,7 +248,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
   <section>
     <h2>5. Tablero de seguimiento</h2>
     <p>
-      Estado global: <strong>22 historias</strong> · <strong>5 completadas</strong> ·
+      Estado global: <strong>23 historias</strong> · <strong>6 completadas</strong> ·
       <strong>1 en curso</strong> · <strong>16 pendientes</strong>.
       (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
     </p>
@@ -262,10 +262,11 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <tr><td><code>HU-003</code></td><td>Definir agrupadores del balance</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-004</code></td><td>Definir ítems dentro de cada agrupador</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-005</code></td><td>Crear y seleccionar la semana</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
-        <tr><td><code>HU-006</code></td><td>Registrar saldos con input-calculadora</td><td>F1</td><td><span class="estado encurso">En curso</span></td><td>17 jul 2026</td></tr>
+        <tr><td><code>HU-006</code></td><td>Registrar saldos con input-calculadora</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-007</code></td><td>Ver el patrimonio neto de la semana</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-008</code></td><td>Gasto de la semana calculado automáticamente</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-009</code></td><td>Historial de semanas</td><td>F1</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-023</code></td><td>Notas por ítem</td><td>F1</td><td><span class="estado encurso">En curso</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-010</code></td><td>Anotar un gasto desde el celular</td><td>F2</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-011</code></td><td>Registrar ingresos</td><td>F2</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-012</code></td><td>Categorías con plantilla por defecto</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
@@ -436,7 +437,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
     <div class="card">
       <div class="hu-head">
         <h3>HU-006 · Registrar saldos con input-calculadora</h3>
-        <span class="estado encurso">En curso</span>
+        <span class="estado completada">Completada · 17 jul 2026</span>
       </div>
       <div class="historia">Como usuario quiero ingresar el saldo de cada ítem escribiendo
         operaciones como en Excel (<code>60000 + 20000</code> guarda <code>80000</code>), para no
@@ -450,7 +451,23 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li>Los saldos de la semana anterior vienen <strong>precargados</strong> como punto de
           partida (la mayoría de cuentas cambia poco semana a semana).</li>
         <li>Los montos se muestran en formato COP con separador de miles.</li>
+        <li><strong>Agregado (17 jul 2026):</strong> cada agrupador del balance se contrae o
+          expande, con botón «Contraer todo / Expandir todo»; contraído muestra solo nombre, tipo,
+          número de ítems y total. Esto completa el criterio pendiente de la HU-004 en la vista de
+          balance.</li>
       </ul>
+      <p><strong>Completada (17 jul 2026).</strong> Los saldos se capturan por ítem dentro de la
+        semana activa, con subtotal por agrupador y precarga desde la semana anterior. Verificado:
+        <strong>21/21 pruebas del evaluador ejecutadas contra el código real</strong>
+        (<code>src/utils/calculadora.ts</code>), incluidas las de seguridad — <code>alert(1)</code>,
+        <code>process.exit(1)</code> y <code>[].constructor</code> son rechazados; guardar,
+        actualizar sin duplicar y copiar saldos probados contra la base real; build limpio y
+        desplegado en <a href="https://contabilidap.netlify.app">contabilidap.netlify.app</a>,
+        confirmado por el usuario.</p>
+      <p style="font-size:14px;"><strong>Nota de implementación:</strong> el evaluador es un parser
+        propio de descenso recursivo. <strong>No se usa <code>eval</code> ni
+        <code>new Function</code></strong>: el texto que escribe el usuario nunca llega a
+        ejecutarse.</p>
     </div>
 
     <div class="card">
@@ -495,6 +512,28 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li>Puedo abrir cualquier semana para ver o editar sus saldos.</li>
         <li>Al corregir un saldo pasado, el gasto de esa semana y de la siguiente se recalculan.</li>
       </ul>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-023 · Notas por ítem</h3>
+        <span class="estado encurso">En curso</span>
+      </div>
+      <div class="historia">Como usuario quiero dejar una nota en un ítem (como las notas de celda
+        que uso en el Excel) para recordar cosas puntuales, sin que la nota esté visible todo el
+        tiempo estorbando la lectura del balance.</div>
+      <ul class="lista">
+        <li>Cada ítem puede tener una nota de texto libre, fija (la misma en todas las semanas).</li>
+        <li>La nota <strong>no se ve por defecto</strong>: hay un indicador discreto y el texto solo
+          se despliega cuando el usuario lo abre.</li>
+        <li>Puedo escribir, editar y borrar la nota desde la pantalla de saldos y desde
+          Configuración.</li>
+        <li>Se distingue a simple vista qué ítems tienen nota y cuáles no.</li>
+      </ul>
+      <p style="font-size:14px;"><strong>Origen:</strong> solicitada por el usuario el 17 jul 2026
+        (alcance nuevo). Decisión tomada con él: la nota va <strong>pegada al ítem</strong> (una
+        sola, permanente), no a la celda ítem×semana. Requiere la migración
+        <code>supabase/migracion_02_notas_items.sql</code>.</p>
     </div>
   </section>
 

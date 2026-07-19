@@ -1,7 +1,7 @@
 import { supabase } from '../supabaseClient'
 import type { ItemBalance } from '../types'
 
-const COLUMNAS = 'id, agrupador_id, nombre, orden'
+const COLUMNAS = 'id, agrupador_id, nombre, orden, nota'
 
 // Lista todos los items de todos los agrupadores, ordenados.
 export async function listarItems(): Promise<ItemBalance[]> {
@@ -31,7 +31,7 @@ export async function crearItem(
 
 export async function actualizarItem(
   id: number,
-  cambios: Partial<Pick<ItemBalance, 'nombre' | 'orden'>>,
+  cambios: Partial<Pick<ItemBalance, 'nombre' | 'orden' | 'nota'>>,
 ): Promise<void> {
   const { error } = await supabase.from('items_balance').update(cambios).eq('id', id)
   if (error) throw new Error(error.message)

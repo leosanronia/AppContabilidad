@@ -14,6 +14,8 @@ export interface ItemBalance {
   agrupador_id: number
   nombre: string
   orden: number
+  // Nota libre del usuario (como las notas de celda del Excel). null = sin nota.
+  nota: string | null
 }
 
 export interface Mes {

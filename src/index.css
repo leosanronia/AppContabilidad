@@ -571,3 +571,69 @@ code {
   font-size: 0.8rem;
   color: #b5342b;
 }
+
+/* ---------- notas por item ---------- */
+.saldo-bloque {
+  border-bottom: 1px dashed transparent;
+}
+
+.btn-nota {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 6px;
+  /* Sin nota: apenas visible, para no estorbar la lectura del balance. */
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+.btn-nota:hover {
+  opacity: 0.9;
+  background: var(--linea-suave);
+}
+
+/* Con nota: se nota a simple vista. */
+.btn-nota-con {
+  opacity: 1;
+  filter: none;
+}
+
+.nota-panel {
+  margin: 0.2rem 0 0.7rem 0;
+  padding: 0.7rem 0.8rem;
+  background: #fffdf2;
+  border: 1px solid #eadfa8;
+  border-radius: 8px;
+}
+
+.nota-texto {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--texto);
+  resize: vertical;
+}
+
+.nota-acciones {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+/* Indicador de nota en Configuracion (el texto sale como tooltip nativo). */
+.marca-nota {
+  margin-left: 0.4rem;
+  font-size: 0.85rem;
+  cursor: help;
+}
+
+.nota-edit {
+  flex: 1 1 100%;
+}
