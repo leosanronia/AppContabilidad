@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { Agrupador, ItemBalance, TipoAgrupador } from '../types'
-import { TIPOS } from '../types'
+import { TIPOS, etiquetaTipo } from '../types'
 import {
   actualizarAgrupador,
   crearAgrupador,
@@ -9,10 +9,6 @@ import {
 } from '../api/agrupadores'
 import { listarItems } from '../api/items'
 import { ItemsAgrupador } from './ItemsAgrupador'
-
-function etiquetaTipo(tipo: TipoAgrupador): string {
-  return TIPOS.find((t) => t.valor === tipo)?.etiqueta ?? tipo
-}
 
 export function Agrupadores() {
   const [lista, setLista] = useState<Agrupador[]>([])

@@ -22,6 +22,13 @@ export interface Mes {
   anio: number
 }
 
+export interface SaldoSemana {
+  id: number
+  item_id: number
+  semana_id: number
+  monto: number
+}
+
 export interface Semana {
   id: number
   mes_id: number
@@ -39,3 +46,7 @@ export const TIPOS: { valor: TipoAgrupador; etiqueta: string }[] = [
   { valor: 'patrimonio', etiqueta: 'Patrimonio' },
   { valor: 'deuda', etiqueta: 'Deuda' },
 ]
+
+export function etiquetaTipo(tipo: TipoAgrupador): string {
+  return TIPOS.find((t) => t.valor === tipo)?.etiqueta ?? tipo
+}

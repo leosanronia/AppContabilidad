@@ -440,3 +440,115 @@ code {
   padding: 0 2px;
   line-height: 1;
 }
+
+/* ---------- saldos de la semana ---------- */
+.seccion-titulo {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--subtexto);
+  border-top: 1px solid var(--linea);
+  padding-top: 1rem;
+  margin: 1.75rem 0 0.9rem;
+}
+
+.saldos {
+  margin-bottom: 0.5rem;
+}
+
+.saldos-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.saldos-titulo {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.saldos-ayuda {
+  font-size: 0.8rem;
+  color: var(--subtexto);
+}
+
+.precarga {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  background: #fff8e6;
+  border: 1px solid #f0dca4;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.88rem;
+  color: #7a5a00;
+  margin-bottom: 1rem;
+}
+
+.grupo-saldo {
+  border: 1px solid var(--linea-suave);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.7rem;
+}
+
+.grupo-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--linea-suave);
+  margin-bottom: 0.4rem;
+}
+
+.grupo-total {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--azul);
+  white-space: nowrap;
+}
+
+.saldo-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+  flex-wrap: wrap;
+}
+
+.saldo-nombre {
+  flex: 1 1 140px;
+  font-size: 0.9rem;
+  color: var(--subtexto);
+}
+
+.saldo-input {
+  width: 130px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.input-error {
+  border-color: #e0908a;
+  background: #fff7f6;
+}
+
+.saldo-formateado {
+  width: 110px;
+  text-align: right;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto);
+  white-space: nowrap;
+}
+
+.saldo-error {
+  flex: 1 1 100%;
+  font-size: 0.8rem;
+  color: #b5342b;
+}

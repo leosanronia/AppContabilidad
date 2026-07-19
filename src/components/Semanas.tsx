@@ -13,6 +13,7 @@ import {
   mesesCandidatos,
   sumarDias,
 } from '../utils/fechas'
+import { Saldos } from './Saldos'
 
 export function Semanas() {
   const [semanas, setSemanas] = useState<Semana[]>([])
@@ -146,6 +147,9 @@ export function Semanas() {
   }
 
   const activa = semanas.find((s) => s.id === activaId) ?? null
+  // La lista viene en orden cronologico: la anterior es la de justo antes.
+  const indiceActiva = semanas.findIndex((s) => s.id === activaId)
+  const semanaAnterior = indiceActiva > 0 ? semanas[indiceActiva - 1] : null
   const recientesPrimero = [...semanas].reverse()
 
   return (
@@ -168,6 +172,10 @@ export function Semanas() {
           <span>No hay ninguna semana seleccionada.</span>
         )}
       </div>
+
+      {activa && <Saldos semana={activa} semanaAnterior={semanaAnterior} />}
+
+      <h3 className="seccion-titulo">Crear o cambiar de semana</h3>
 
       <form className="form-semana" onSubmit={crear}>
         <label className="campo">
