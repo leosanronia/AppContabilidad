@@ -1,6 +1,5 @@
 import { supabase } from '../supabaseClient'
 import type { Mes, Semana } from '../types'
-import { anioDe, nombreMes } from '../utils/fechas'
 
 const COLS = 'id, mes_id, rango, numero, gasto_semana, fecha_inicio, fecha_fin'
 
@@ -44,12 +43,16 @@ export async function obtenerOCrearMes(nombre: string, anio: number): Promise<Me
   return data as Mes
 }
 
+// El mes se recibe explicitamente: la app lo propone, pero el usuario decide
+// (una semana que cruza de mes puede ir en cualquiera de los dos).
 export async function crearSemana(
   fechaInicio: string,
   fechaFin: string,
   rango: string,
+  mesNombre: string,
+  mesAnio: number,
 ): Promise<Semana> {
-  const mes = await obtenerOCrearMes(nombreMes(fechaInicio), anioDe(fechaInicio))
+  const mes = await obtenerOCrearMes(mesNombre, mesAnio)
 
   // numero = posicion de la semana dentro de su mes.
   const { count } = await supabase
@@ -77,6 +80,29 @@ export async function crearSemana(
     throw new Error(error.message)
   }
   return data as Semana
+}
+
+// Reasigna una semana existente a otro mes (creandolo si hace falta) y
+// recalcula su numero dentro de ese mes.
+export async function cambiarMesDeSemana(
+  semanaId: number,
+  mesNombre: string,
+  mesAnio: number,
+): Promise<void> {
+  const mes = await obtenerOCrearMes(mesNombre, mesAnio)
+
+  // Cuenta las otras semanas del mes destino (excluye la que se esta moviendo).
+  const { count } = await supabase
+    .from('semanas')
+    .select('*', { count: 'exact', head: true })
+    .eq('mes_id', mes.id)
+    .neq('id', semanaId)
+
+  const { error } = await supabase
+    .from('semanas')
+    .update({ mes_id: mes.id, numero: (count ?? 0) + 1 })
+    .eq('id', semanaId)
+  if (error) throw new Error(error.message)
 }
 
 export async function eliminarSemana(id: number): Promise<void> {

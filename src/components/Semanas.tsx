@@ -1,12 +1,18 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { Mes, Semana } from '../types'
 import {
+  cambiarMesDeSemana,
   crearSemana,
   eliminarSemana,
   listarMeses,
   listarSemanas,
 } from '../api/semanas'
-import { formatearRango, hoyISO, sumarDias } from '../utils/fechas'
+import {
+  formatearRango,
+  hoyISO,
+  mesesCandidatos,
+  sumarDias,
+} from '../utils/fechas'
 
 export function Semanas() {
   const [semanas, setSemanas] = useState<Semana[]>([])
@@ -18,6 +24,10 @@ export function Semanas() {
 
   const [inicio, setInicio] = useState(hoyISO())
   const [fin, setFin] = useState(sumarDias(hoyISO(), 6))
+  const [mesElegido, setMesElegido] = useState('')
+
+  const [editandoId, setEditandoId] = useState<number | null>(null)
+  const [mesEdicion, setMesEdicion] = useState('')
 
   useEffect(() => {
     void (async () => {
@@ -35,7 +45,14 @@ export function Semanas() {
     })()
   }, [])
 
-  // Sugiere la semana siguiente: arranca el dia despues del fin de la ultima.
+  // Al cambiar las fechas, se propone el mes donde TERMINA la semana
+  // (convencion del Excel). El usuario puede cambiarlo en el selector.
+  useEffect(() => {
+    if (!inicio || !fin || fin < inicio) return
+    const cands = mesesCandidatos(inicio, fin)
+    setMesElegido(cands[cands.length - 1].clave)
+  }, [inicio, fin])
+
   function aplicarSugerencia(lista: Semana[]) {
     const ultima = lista[lista.length - 1]
     const nuevoInicio = ultima?.fecha_fin
@@ -66,28 +83,54 @@ export function Semanas() {
     })()
   }
 
-  // Al mover el inicio, la semana propuesta sigue siendo de 7 dias.
   function cambiarInicio(valor: string) {
     setInicio(valor)
     if (valor) setFin(sumarDias(valor, 6))
   }
 
   const rangoValido = Boolean(inicio && fin && fin >= inicio)
+  const candidatos = rangoValido ? mesesCandidatos(inicio, fin) : []
   const etiqueta = rangoValido ? formatearRango(inicio, fin) : ''
 
   function crear(e: FormEvent) {
     e.preventDefault()
-    if (!rangoValido) return
+    if (!rangoValido || candidatos.length === 0) return
+    const elegido =
+      candidatos.find((m) => m.clave === mesElegido) ??
+      candidatos[candidatos.length - 1]
     ejecutar(async () => {
-      const nueva = await crearSemana(inicio, fin, formatearRango(inicio, fin))
+      const nueva = await crearSemana(
+        inicio,
+        fin,
+        formatearRango(inicio, fin),
+        elegido.nombre,
+        elegido.anio,
+      )
       const ss = await recargar()
       setActivaId(nueva.id)
       aplicarSugerencia(ss)
     })
   }
 
+  function iniciarEdicionMes(s: Semana) {
+    setEditandoId(s.id)
+    const actual = meses.find((m) => m.id === s.mes_id)
+    setMesEdicion(actual ? `${actual.nombre}-${actual.anio}` : '')
+  }
+
+  function guardarMes(s: Semana) {
+    const cands = mesesCandidatos(s.fecha_inicio, s.fecha_fin)
+    const elegido = cands.find((m) => m.clave === mesEdicion)
+    if (!elegido) return
+    ejecutar(async () => {
+      await cambiarMesDeSemana(s.id, elegido.nombre, elegido.anio)
+      await recargar()
+      setEditandoId(null)
+    })
+  }
+
   function borrar(s: Semana) {
-    if (!confirm(`¿Eliminar la semana "${s.rango}"? También se borran sus saldos.`))
+    if (!confirm(`¿Eliminar la semana ${s.rango}? También se borran sus saldos.`))
       return
     ejecutar(async () => {
       await eliminarSemana(s.id)
@@ -109,8 +152,9 @@ export function Semanas() {
     <section className="panel">
       <h2 className="panel-titulo">Semanas</h2>
       <p className="panel-sub">
-        Cada semana es una foto de tu balance. El mes se crea solo a partir de la
-        fecha que elijas.
+        Cada semana es una foto de tu balance. El mes se propone solo, pero lo
+        puedes cambiar: una semana que cruza de mes puede ir en cualquiera de los
+        dos.
       </p>
 
       <div className={`banner-activa ${activa ? '' : 'banner-vacio'}`}>
@@ -145,6 +189,21 @@ export function Semanas() {
             onChange={(e) => setFin(e.target.value)}
           />
         </label>
+        <label className="campo">
+          <span className="campo-etiqueta">Aplica al mes</span>
+          <select
+            className="input"
+            value={mesElegido}
+            onChange={(e) => setMesElegido(e.target.value)}
+            disabled={candidatos.length === 0}
+          >
+            {candidatos.map((m) => (
+              <option key={m.clave} value={m.clave}>
+                {m.etiqueta}
+              </option>
+            ))}
+          </select>
+        </label>
         <button
           className="btn btn-primario"
           type="submit"
@@ -157,6 +216,7 @@ export function Semanas() {
       {etiqueta && (
         <p className="preview-rango">
           Se guardará como: <strong>{etiqueta}</strong>
+          {candidatos.length > 1 && ' · cruza de mes, revisa a cuál aplica'}
         </p>
       )}
       {inicio && fin && !rangoValido && (
@@ -174,34 +234,82 @@ export function Semanas() {
 
       {semanas.length > 0 && (
         <ul className="lista">
-          {recientesPrimero.map((s) => (
-            <li
-              key={s.id}
-              className={`semana-fila ${s.id === activaId ? 'semana-activa' : ''}`}
-            >
-              <button
-                className="semana-selector"
-                onClick={() => setActivaId(s.id)}
-                title="Seleccionar esta semana"
+          {recientesPrimero.map((s) => {
+            const cands = mesesCandidatos(s.fecha_inicio, s.fecha_fin)
+            const cruzaDeMes = cands.length > 1
+            return (
+              <li
+                key={s.id}
+                className={`semana-fila ${s.id === activaId ? 'semana-activa' : ''}`}
               >
-                {s.id === activaId ? '●' : '○'}
-              </button>
-              <span className="fila-nombre">{s.rango}</span>
-              <span className="item-count">
-                {nombreDelMes(s.mes_id)}
-                {s.numero ? ` · sem. ${s.numero}` : ''}
-              </span>
-              <div className="fila-acciones">
                 <button
-                  className="btn btn-sm btn-peligro"
-                  onClick={() => borrar(s)}
-                  disabled={ocupado}
+                  className="semana-selector"
+                  onClick={() => setActivaId(s.id)}
+                  title="Seleccionar esta semana"
                 >
-                  Eliminar
+                  {s.id === activaId ? '●' : '○'}
                 </button>
-              </div>
-            </li>
-          ))}
+                <span className="fila-nombre">{s.rango}</span>
+
+                {editandoId === s.id ? (
+                  <>
+                    <select
+                      className="input input-sm"
+                      value={mesEdicion}
+                      onChange={(e) => setMesEdicion(e.target.value)}
+                    >
+                      {cands.map((m) => (
+                        <option key={m.clave} value={m.clave}>
+                          {m.etiqueta}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="fila-acciones">
+                      <button
+                        className="btn btn-sm btn-primario"
+                        onClick={() => guardarMes(s)}
+                        disabled={ocupado}
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        className="btn btn-sm btn-ghost"
+                        onClick={() => setEditandoId(null)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="item-count">
+                      {nombreDelMes(s.mes_id)}
+                      {s.numero ? ` · sem. ${s.numero}` : ''}
+                    </span>
+                    <div className="fila-acciones">
+                      {cruzaDeMes && (
+                        <button
+                          className="btn btn-sm btn-ghost"
+                          onClick={() => iniciarEdicionMes(s)}
+                          disabled={ocupado}
+                          title="Cambiar el mes al que aplica"
+                        >
+                          Cambiar mes
+                        </button>
+                      )}
+                      <button
+                        className="btn btn-sm btn-peligro"
+                        onClick={() => borrar(s)}
+                        disabled={ocupado}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </>
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>

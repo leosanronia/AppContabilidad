@@ -45,6 +45,32 @@ export function anioDe(iso: string): number {
   return aFecha(iso).getFullYear()
 }
 
+export interface MesCandidato {
+  nombre: string
+  anio: number
+  clave: string
+  etiqueta: string
+}
+
+// Meses a los que puede pertenecer una semana: el de inicio y el de fin.
+// Cuando la semana cruza de mes, el ULTIMO del arreglo es el mes donde
+// termina — ese es el valor por defecto, siguiendo la convencion del Excel
+// (29 dic - 4 ene va en Enero; 27 abr - 3 may va en Mayo).
+export function mesesCandidatos(inicio: string, fin: string): MesCandidato[] {
+  const lista: MesCandidato[] = []
+  const agregar = (iso: string) => {
+    const nombre = nombreMes(iso)
+    const anio = anioDe(iso)
+    const clave = `${nombre}-${anio}`
+    if (!lista.some((m) => m.clave === clave)) {
+      lista.push({ nombre, anio, clave, etiqueta: `${nombre} ${anio}` })
+    }
+  }
+  agregar(inicio)
+  agregar(fin)
+  return lista
+}
+
 // Etiqueta como en el Excel: "1 - 7 dic" dentro del mismo mes,
 // "27 abr - 3 may" cuando la semana cruza de mes.
 export function formatearRango(inicio: string, fin: string): string {

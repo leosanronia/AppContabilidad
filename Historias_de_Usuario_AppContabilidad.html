@@ -417,6 +417,11 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li>Cada semana pertenece a un mes; si el mes no existe, se crea sin pasos extra.</li>
         <li>La app sugiere la semana siguiente automáticamente (rango consecutivo a la última).</li>
         <li>No se pueden crear semanas duplicadas; siempre es claro cuál es la semana activa.</li>
+        <li><strong>Criterio agregado (17 jul 2026):</strong> el mes se propone solo, pero
+          <strong>puedo cambiarlo</strong> — al crear la semana y también después. Para semanas que
+          cruzan de mes, el valor por defecto es el mes donde <strong>termina</strong> la semana,
+          que es la convención del Excel del usuario (<code>29 dic - 4 ene</code> va en Enero;
+          <code>27 abr - 3 may</code> va en Mayo).</li>
       </ul>
     </div>
 
