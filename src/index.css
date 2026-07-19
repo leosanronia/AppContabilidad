@@ -475,6 +475,13 @@ code {
   color: var(--subtexto);
 }
 
+.saldos-acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
 .precarga {
   display: flex;
   align-items: center;
@@ -504,6 +511,18 @@ code {
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--linea-suave);
   margin-bottom: 0.4rem;
+}
+
+.grupo-cabecera-clic {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Contraido: la cabecera es toda la tarjeta, sin linea divisoria. */
+.grupo-cabecera-cerrada {
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .grupo-total {

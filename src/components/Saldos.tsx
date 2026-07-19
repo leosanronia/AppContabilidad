@@ -20,6 +20,8 @@ export function Saldos({ semana, semanaAnterior }: Props) {
   // itemId -> lo que el usuario esta escribiendo (puede ser una operacion)
   const [textos, setTextos] = useState<Record<number, string>>({})
   const [errores, setErrores] = useState<Record<number, string>>({})
+  // Agrupadores contraidos (por defecto se ven expandidos para poder capturar).
+  const [contraidos, setContraidos] = useState<Set<number>>(new Set())
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
@@ -55,6 +57,24 @@ export function Saldos({ semana, semanaAnterior }: Props) {
     } finally {
       setCargando(false)
     }
+  }
+
+  function alternarContraido(id: number) {
+    setContraidos((prev) => {
+      const siguiente = new Set(prev)
+      if (siguiente.has(id)) siguiente.delete(id)
+      else siguiente.add(id)
+      return siguiente
+    })
+  }
+
+  const todosContraidos =
+    agrupadores.length > 0 && contraidos.size === agrupadores.length
+
+  function alternarTodos() {
+    setContraidos(
+      todosContraidos ? new Set() : new Set(agrupadores.map((a) => a.id)),
+    )
   }
 
   // Al salir del campo (o con Enter) se evalua la operacion y se guarda.
@@ -117,9 +137,16 @@ export function Saldos({ semana, semanaAnterior }: Props) {
     <div className="saldos">
       <div className="saldos-cabecera">
         <h3 className="saldos-titulo">Saldos de {semana.rango}</h3>
-        <span className="saldos-ayuda">
-          Puedes escribir operaciones: <code>60000 + 20000</code>
-        </span>
+        <div className="saldos-acciones">
+          <span className="saldos-ayuda">
+            Puedes escribir operaciones: <code>60000 + 20000</code>
+          </span>
+          {agrupadores.length > 0 && (
+            <button className="btn btn-sm btn-ghost" onClick={alternarTodos}>
+              {todosContraidos ? 'Expandir todo' : 'Contraer todo'}
+            </button>
+          )}
+        </div>
       </div>
 
       {!cargando && sinSaldos && semanaAnterior && (
@@ -152,52 +179,70 @@ export function Saldos({ semana, semanaAnterior }: Props) {
             (acc, it) => acc + (saldos[it.id] ?? 0),
             0,
           )
+          const abierto = !contraidos.has(a.id)
           return (
             <div className="grupo-saldo" key={a.id}>
-              <div className="grupo-cabecera">
+              <div
+                className={`grupo-cabecera grupo-cabecera-clic ${
+                  abierto ? '' : 'grupo-cabecera-cerrada'
+                }`}
+                onClick={() => alternarContraido(a.id)}
+              >
+                <button
+                  type="button"
+                  className="expandir"
+                  title={abierto ? 'Contraer' : 'Expandir'}
+                  aria-expanded={abierto}
+                >
+                  {abierto ? '▾' : '▸'}
+                </button>
                 <span className="fila-nombre">{a.nombre}</span>
+                <span className="item-count">
+                  {susItems.length} ítem{susItems.length === 1 ? '' : 's'}
+                </span>
                 <span className={`badge badge-${a.tipo}`}>
                   {etiquetaTipo(a.tipo)}
                 </span>
                 <strong className="grupo-total">{formatearCOP(total)}</strong>
               </div>
 
-              {susItems.length === 0 && (
+              {abierto && susItems.length === 0 && (
                 <p className="items-vacio">
                   Sin ítems. Agrégalos en Configuración.
                 </p>
               )}
 
-              {susItems.map((it) => (
-                <div className="saldo-fila" key={it.id}>
-                  <label className="saldo-nombre" htmlFor={`item-${it.id}`}>
-                    {it.nombre}
-                  </label>
-                  <input
-                    id={`item-${it.id}`}
-                    className={`input input-sm saldo-input ${
-                      errores[it.id] ? 'input-error' : ''
-                    }`}
-                    placeholder="0"
-                    value={textos[it.id] ?? ''}
-                    onChange={(e) =>
-                      setTextos((p) => ({ ...p, [it.id]: e.target.value }))
-                    }
-                    onBlur={() => confirmar(it.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') e.currentTarget.blur()
-                    }}
-                  />
-                  <span className="saldo-formateado">
-                    {saldos[it.id] !== undefined
-                      ? formatearCOP(saldos[it.id])
-                      : '—'}
-                  </span>
-                  {errores[it.id] && (
-                    <span className="saldo-error">{errores[it.id]}</span>
-                  )}
-                </div>
-              ))}
+              {abierto &&
+                susItems.map((it) => (
+                  <div className="saldo-fila" key={it.id}>
+                    <label className="saldo-nombre" htmlFor={`item-${it.id}`}>
+                      {it.nombre}
+                    </label>
+                    <input
+                      id={`item-${it.id}`}
+                      className={`input input-sm saldo-input ${
+                        errores[it.id] ? 'input-error' : ''
+                      }`}
+                      placeholder="0"
+                      value={textos[it.id] ?? ''}
+                      onChange={(e) =>
+                        setTextos((p) => ({ ...p, [it.id]: e.target.value }))
+                      }
+                      onBlur={() => confirmar(it.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') e.currentTarget.blur()
+                      }}
+                    />
+                    <span className="saldo-formateado">
+                      {saldos[it.id] !== undefined
+                        ? formatearCOP(saldos[it.id])
+                        : '—'}
+                    </span>
+                    {errores[it.id] && (
+                      <span className="saldo-error">{errores[it.id]}</span>
+                    )}
+                  </div>
+                ))}
             </div>
           )
         })}
