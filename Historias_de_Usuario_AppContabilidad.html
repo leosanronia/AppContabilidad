@@ -484,9 +484,9 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
       </ul>
       <p><strong>Completada (17 jul 2026).</strong> Panel de resumen sobre los agrupadores con
         Tengo (liquidez + patrimonio), Debo (deudas) y Patrimonio neto, recalculado en vivo al
-        escribir cada saldo. Verificado con los datos reales del usuario: la semana
-        <code>13 - 19 jul</code> dio un neto de <strong>$137.904.747</strong>, calculado desde la
-        base con la misma fórmula de la app y confirmado por el usuario.</p>
+        escribir cada saldo. Verificado con los datos reales del usuario: el neto de la semana se
+        calculó desde la base con la misma fórmula de la app y el usuario lo confirmó contra su
+        Excel. (Las cifras concretas no se documentan aquí por privacidad.)</p>
     </div>
 
     <div class="card">
@@ -504,9 +504,9 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li>Si es la primera semana registrada, se indica que no hay contra qué comparar.</li>
       </ul>
       <p><strong>Completada (17 jul 2026).</strong> El gasto aparece junto al neto, con la
-        referencia de la semana contra la que se compara. Verificado con datos reales: entre
-        <code>13 - 19 jul</code> ($137.904.747) y <code>20 - 26 jul</code> ($137.644.747) calculó un
-        gasto de <strong>$260.000</strong>, confirmado por el usuario. Casos borde cubiertos:
+        referencia de la semana contra la que se compara. Verificado con datos reales: entre dos
+        semanas consecutivas calculó el gasto por reconciliación y el usuario lo confirmó contra su
+        Excel. (Las cifras concretas no se documentan aquí por privacidad.) Casos borde cubiertos:
         primera semana sin comparación, semana anterior sin saldos (evita mostrar un gasto falso de
         millones), y neto que sube → se muestra como «tu patrimonio creció» con la explicación de
         que suele ser un ingreso (HU-011).</p>
