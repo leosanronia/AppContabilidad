@@ -167,6 +167,20 @@ export function Saldos({ semana, semanaAnterior }: Props) {
 
   const sinSaldos = Object.keys(saldos).length === 0
 
+  function totalDeAgrupador(agrupadorId: number): number {
+    return items
+      .filter((i) => i.agrupador_id === agrupadorId)
+      .reduce((acc, it) => acc + (saldos[it.id] ?? 0), 0)
+  }
+
+  // Patrimonio neto = liquidez + patrimonio − deudas.
+  // Nunca se guarda en la base: siempre se calcula desde los saldos.
+  const porTipo = { liquidez: 0, patrimonio: 0, deuda: 0 }
+  for (const a of agrupadores) porTipo[a.tipo] += totalDeAgrupador(a.id)
+  const tengo = porTipo.liquidez + porTipo.patrimonio
+  const debo = porTipo.deuda
+  const neto = tengo - debo
+
   return (
     <div className="saldos">
       <div className="saldos-cabecera">
@@ -182,6 +196,30 @@ export function Saldos({ semana, semanaAnterior }: Props) {
           )}
         </div>
       </div>
+
+      {!cargando && agrupadores.length > 0 && (
+        <div className="resumen-neto">
+          <div className="resumen-linea">
+            <span className="resumen-etiqueta">Tengo</span>
+            <span className="resumen-detalle">
+              liquidez {formatearCOP(porTipo.liquidez)} · patrimonio{' '}
+              {formatearCOP(porTipo.patrimonio)}
+            </span>
+            <span className="resumen-valor">{formatearCOP(tengo)}</span>
+          </div>
+          <div className="resumen-linea">
+            <span className="resumen-etiqueta">Debo</span>
+            <span className="resumen-detalle">deudas</span>
+            <span className="resumen-valor resumen-negativo">
+              − {formatearCOP(debo)}
+            </span>
+          </div>
+          <div className="resumen-linea resumen-total">
+            <span className="resumen-etiqueta">Patrimonio neto</span>
+            <span className="resumen-valor">{formatearCOP(neto)}</span>
+          </div>
+        </div>
+      )}
 
       {!cargando && sinSaldos && semanaAnterior && (
         <div className="precarga">
@@ -209,10 +247,7 @@ export function Saldos({ semana, semanaAnterior }: Props) {
       {!cargando &&
         agrupadores.map((a) => {
           const susItems = items.filter((i) => i.agrupador_id === a.id)
-          const total = susItems.reduce(
-            (acc, it) => acc + (saldos[it.id] ?? 0),
-            0,
-          )
+          const total = totalDeAgrupador(a.id)
           const abierto = !contraidos.has(a.id)
           return (
             <div className="grupo-saldo" key={a.id}>

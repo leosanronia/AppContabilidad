@@ -572,6 +572,63 @@ code {
   color: #b5342b;
 }
 
+/* ---------- resumen: patrimonio neto ---------- */
+.resumen-neto {
+  background: var(--azul);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.1rem;
+}
+
+.resumen-linea {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.25rem 0;
+}
+
+.resumen-etiqueta {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.resumen-detalle {
+  font-size: 0.72rem;
+  opacity: 0.6;
+  flex: 1 1 auto;
+}
+
+.resumen-valor {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.resumen-negativo {
+  opacity: 0.85;
+}
+
+.resumen-total {
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+}
+
+.resumen-total .resumen-etiqueta {
+  font-size: 0.95rem;
+  font-weight: 700;
+  opacity: 1;
+}
+
+.resumen-total .resumen-valor {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 /* ---------- notas por item ---------- */
 .saldo-bloque {
   border-bottom: 1px dashed transparent;
