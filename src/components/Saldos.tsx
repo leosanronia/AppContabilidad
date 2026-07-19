@@ -10,9 +10,11 @@ import { formatearCOP } from '../utils/moneda'
 interface Props {
   semana: Semana
   semanaAnterior: Semana | null
+  // Avisa al padre que los saldos cambiaron, para refrescar el historial.
+  onSaldosCambiaron?: () => void
 }
 
-export function Saldos({ semana, semanaAnterior }: Props) {
+export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
   const [agrupadores, setAgrupadores] = useState<Agrupador[]>([])
   const [items, setItems] = useState<ItemBalance[]>([])
   // itemId -> monto guardado en la semana activa
@@ -118,6 +120,7 @@ export function Saldos({ semana, semanaAnterior }: Props) {
         await guardarSaldo(itemId, semana.id, valor)
         setSaldos((p) => ({ ...p, [itemId]: valor }))
         setTextos((p) => ({ ...p, [itemId]: String(valor) }))
+        onSaldosCambiaron?.()
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e))
       } finally {
@@ -168,6 +171,7 @@ export function Saldos({ semana, semanaAnterior }: Props) {
           setError('La semana anterior todavía no tiene saldos para copiar.')
         }
         await cargar()
+        onSaldosCambiaron?.()
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e))
       } finally {

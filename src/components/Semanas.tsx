@@ -1,5 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import type { Mes, Semana } from '../types'
+import type {
+  Agrupador,
+  ItemBalance,
+  Mes,
+  SaldoSemana,
+  Semana,
+  TipoAgrupador,
+} from '../types'
 import {
   cambiarMesDeSemana,
   crearSemana,
@@ -7,17 +14,29 @@ import {
   listarMeses,
   listarSemanas,
 } from '../api/semanas'
+import { listarAgrupadores } from '../api/agrupadores'
+import { listarItems } from '../api/items'
+import { listarTodosLosSaldos } from '../api/saldos'
 import {
   formatearRango,
   hoyISO,
   mesesCandidatos,
   sumarDias,
 } from '../utils/fechas'
+import { formatearCOP } from '../utils/moneda'
 import { Saldos } from './Saldos'
+
+interface ResumenSemana {
+  neto: number
+  tieneSaldos: boolean
+}
 
 export function Semanas() {
   const [semanas, setSemanas] = useState<Semana[]>([])
   const [meses, setMeses] = useState<Mes[]>([])
+  const [agrupadores, setAgrupadores] = useState<Agrupador[]>([])
+  const [items, setItems] = useState<ItemBalance[]>([])
+  const [todosSaldos, setTodosSaldos] = useState<SaldoSemana[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
@@ -33,9 +52,7 @@ export function Semanas() {
   useEffect(() => {
     void (async () => {
       try {
-        const [ss, ms] = await Promise.all([listarSemanas(), listarMeses()])
-        setSemanas(ss)
-        setMeses(ms)
+        const ss = await recargar()
         if (ss.length > 0) setActivaId(ss[ss.length - 1].id)
         aplicarSugerencia(ss)
       } catch (e) {
@@ -64,10 +81,31 @@ export function Semanas() {
   }
 
   async function recargar(): Promise<Semana[]> {
-    const [ss, ms] = await Promise.all([listarSemanas(), listarMeses()])
+    const [ss, ms, ags, its, sal] = await Promise.all([
+      listarSemanas(),
+      listarMeses(),
+      listarAgrupadores(),
+      listarItems(),
+      listarTodosLosSaldos(),
+    ])
     setSemanas(ss)
     setMeses(ms)
+    setAgrupadores(ags)
+    setItems(its)
+    setTodosSaldos(sal)
     return ss
+  }
+
+  // Se llama cuando la pantalla de saldos guarda algo, para que el historial
+  // (neto y gasto de cada semana) quede al dia sin recargar la pagina.
+  function refrescarSaldos() {
+    void (async () => {
+      try {
+        setTodosSaldos(await listarTodosLosSaldos())
+      } catch {
+        // Un fallo al refrescar el historial no debe interrumpir la captura.
+      }
+    })()
   }
 
   function ejecutar(fn: () => Promise<void>) {
@@ -146,6 +184,44 @@ export function Semanas() {
     return m ? `${m.nombre} ${m.anio}` : ''
   }
 
+  // ---- Historial: neto y gasto de cada semana ----
+  const tipoDeItem = new Map<number, TipoAgrupador>()
+  for (const it of items) {
+    const ag = agrupadores.find((a) => a.id === it.agrupador_id)
+    if (ag) tipoDeItem.set(it.id, ag.tipo)
+  }
+
+  const saldosPorSemana = new Map<number, SaldoSemana[]>()
+  for (const sal of todosSaldos) {
+    const arr = saldosPorSemana.get(sal.semana_id) ?? []
+    arr.push(sal)
+    saldosPorSemana.set(sal.semana_id, arr)
+  }
+
+  const resumen = new Map<number, ResumenSemana>()
+  for (const s of semanas) {
+    const propios = saldosPorSemana.get(s.id) ?? []
+    const t = { liquidez: 0, patrimonio: 0, deuda: 0 }
+    for (const sal of propios) {
+      const tipo = tipoDeItem.get(sal.item_id)
+      if (tipo) t[tipo] += sal.monto
+    }
+    resumen.set(s.id, {
+      neto: t.liquidez + t.patrimonio - t.deuda,
+      tieneSaldos: propios.length > 0,
+    })
+  }
+
+  // gasto = neto(semana anterior) − neto(semana actual); null si no se puede.
+  const gastos = new Map<number, number | null>()
+  semanas.forEach((s, i) => {
+    const r = resumen.get(s.id)
+    const previa = i > 0 ? semanas[i - 1] : null
+    const rp = previa ? resumen.get(previa.id) : null
+    if (!r?.tieneSaldos || !rp?.tieneSaldos) gastos.set(s.id, null)
+    else gastos.set(s.id, rp.neto - r.neto)
+  })
+
   const activa = semanas.find((s) => s.id === activaId) ?? null
   // La lista viene en orden cronologico: la anterior es la de justo antes.
   const indiceActiva = semanas.findIndex((s) => s.id === activaId)
@@ -173,9 +249,130 @@ export function Semanas() {
         )}
       </div>
 
-      {activa && <Saldos semana={activa} semanaAnterior={semanaAnterior} />}
+      {activa && (
+        <Saldos
+          semana={activa}
+          semanaAnterior={semanaAnterior}
+          onSaldosCambiaron={refrescarSaldos}
+        />
+      )}
 
-      <h3 className="seccion-titulo">Crear o cambiar de semana</h3>
+      <h3 className="seccion-titulo">Historial de semanas</h3>
+
+      {error && <div className="aviso aviso-error">{error}</div>}
+      {cargando && <p className="aviso">Cargando semanas…</p>}
+
+      {!cargando && semanas.length === 0 && (
+        <p className="vacio">Aún no tienes semanas. Crea la primera abajo.</p>
+      )}
+
+      {semanas.length > 0 && (
+        <ul className="lista">
+          {recientesPrimero.map((s) => {
+            const cands = mesesCandidatos(s.fecha_inicio, s.fecha_fin)
+            const cruzaDeMes = cands.length > 1
+            const r = resumen.get(s.id)
+            const g = gastos.get(s.id) ?? null
+            return (
+              <li
+                key={s.id}
+                className={`semana-fila ${s.id === activaId ? 'semana-activa' : ''}`}
+              >
+                <button
+                  className="semana-selector"
+                  onClick={() => setActivaId(s.id)}
+                  title="Abrir esta semana"
+                >
+                  {s.id === activaId ? '●' : '○'}
+                </button>
+                <span className="fila-nombre">{s.rango}</span>
+
+                {editandoId === s.id ? (
+                  <>
+                    <select
+                      className="input input-sm"
+                      value={mesEdicion}
+                      onChange={(e) => setMesEdicion(e.target.value)}
+                    >
+                      {cands.map((m) => (
+                        <option key={m.clave} value={m.clave}>
+                          {m.etiqueta}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="fila-acciones">
+                      <button
+                        className="btn btn-sm btn-primario"
+                        onClick={() => guardarMes(s)}
+                        disabled={ocupado}
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        className="btn btn-sm btn-ghost"
+                        onClick={() => setEditandoId(null)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="item-count">
+                      {nombreDelMes(s.mes_id)}
+                      {s.numero ? ` · sem. ${s.numero}` : ''}
+                    </span>
+
+                    <span className="hist-dato">
+                      <span className="hist-etiqueta">Neto</span>
+                      <span className="hist-valor">
+                        {r?.tieneSaldos ? formatearCOP(r.neto) : '—'}
+                      </span>
+                    </span>
+
+                    <span className="hist-dato">
+                      <span className="hist-etiqueta">Gasto</span>
+                      <span
+                        className={`hist-valor ${
+                          g !== null && g < 0 ? 'hist-crecio' : ''
+                        }`}
+                      >
+                        {g === null
+                          ? '—'
+                          : g >= 0
+                            ? formatearCOP(g)
+                            : `+${formatearCOP(Math.abs(g))}`}
+                      </span>
+                    </span>
+
+                    <div className="fila-acciones">
+                      {cruzaDeMes && (
+                        <button
+                          className="btn btn-sm btn-ghost"
+                          onClick={() => iniciarEdicionMes(s)}
+                          disabled={ocupado}
+                          title="Cambiar el mes al que aplica"
+                        >
+                          Cambiar mes
+                        </button>
+                      )}
+                      <button
+                        className="btn btn-sm btn-peligro"
+                        onClick={() => borrar(s)}
+                        disabled={ocupado}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+
+      <h3 className="seccion-titulo">Crear una semana</h3>
 
       <form className="form-semana" onSubmit={crear}>
         <label className="campo">
@@ -231,94 +428,6 @@ export function Semanas() {
         <div className="aviso aviso-error">
           La fecha final no puede ser anterior a la inicial.
         </div>
-      )}
-
-      {error && <div className="aviso aviso-error">{error}</div>}
-      {cargando && <p className="aviso">Cargando semanas…</p>}
-
-      {!cargando && semanas.length === 0 && (
-        <p className="vacio">Aún no tienes semanas. Crea la primera arriba.</p>
-      )}
-
-      {semanas.length > 0 && (
-        <ul className="lista">
-          {recientesPrimero.map((s) => {
-            const cands = mesesCandidatos(s.fecha_inicio, s.fecha_fin)
-            const cruzaDeMes = cands.length > 1
-            return (
-              <li
-                key={s.id}
-                className={`semana-fila ${s.id === activaId ? 'semana-activa' : ''}`}
-              >
-                <button
-                  className="semana-selector"
-                  onClick={() => setActivaId(s.id)}
-                  title="Seleccionar esta semana"
-                >
-                  {s.id === activaId ? '●' : '○'}
-                </button>
-                <span className="fila-nombre">{s.rango}</span>
-
-                {editandoId === s.id ? (
-                  <>
-                    <select
-                      className="input input-sm"
-                      value={mesEdicion}
-                      onChange={(e) => setMesEdicion(e.target.value)}
-                    >
-                      {cands.map((m) => (
-                        <option key={m.clave} value={m.clave}>
-                          {m.etiqueta}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="fila-acciones">
-                      <button
-                        className="btn btn-sm btn-primario"
-                        onClick={() => guardarMes(s)}
-                        disabled={ocupado}
-                      >
-                        Guardar
-                      </button>
-                      <button
-                        className="btn btn-sm btn-ghost"
-                        onClick={() => setEditandoId(null)}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <span className="item-count">
-                      {nombreDelMes(s.mes_id)}
-                      {s.numero ? ` · sem. ${s.numero}` : ''}
-                    </span>
-                    <div className="fila-acciones">
-                      {cruzaDeMes && (
-                        <button
-                          className="btn btn-sm btn-ghost"
-                          onClick={() => iniciarEdicionMes(s)}
-                          disabled={ocupado}
-                          title="Cambiar el mes al que aplica"
-                        >
-                          Cambiar mes
-                        </button>
-                      )}
-                      <button
-                        className="btn btn-sm btn-peligro"
-                        onClick={() => borrar(s)}
-                        disabled={ocupado}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </>
-                )}
-              </li>
-            )
-          })}
-        </ul>
       )}
     </section>
   )

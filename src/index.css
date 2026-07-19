@@ -441,6 +441,32 @@ code {
   line-height: 1;
 }
 
+/* ---------- historial: neto y gasto por semana ---------- */
+.hist-dato {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 104px;
+}
+
+.hist-etiqueta {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--subtexto);
+}
+
+.hist-valor {
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* El neto subio en vez de bajar (probable ingreso). */
+.hist-crecio {
+  color: #1a7a4a;
+}
+
 /* ---------- saldos de la semana ---------- */
 .seccion-titulo {
   font-size: 0.82rem;

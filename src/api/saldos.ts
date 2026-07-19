@@ -15,6 +15,14 @@ export async function listarSaldosDeSemana(
   return (data ?? []).map((s: SaldoSemana) => ({ ...s, monto: Number(s.monto) }))
 }
 
+// Todos los saldos de todas las semanas, para calcular el historial
+// (neto y gasto de cada semana) en una sola consulta.
+export async function listarTodosLosSaldos(): Promise<SaldoSemana[]> {
+  const { data, error } = await supabase.from('saldos_semana').select(COLS)
+  if (error) throw new Error(error.message)
+  return (data ?? []).map((s: SaldoSemana) => ({ ...s, monto: Number(s.monto) }))
+}
+
 // Crea o actualiza el saldo de un item en una semana.
 // La tabla tiene unique(item_id, semana_id), asi que upsert no duplica.
 export async function guardarSaldo(
