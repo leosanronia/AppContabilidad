@@ -629,6 +629,26 @@ code {
   letter-spacing: -0.02em;
 }
 
+/* Gasto por reconciliacion (el numero que antes se cuadraba a mano). */
+.resumen-gasto {
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+}
+
+.resumen-gasto-valor {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffd98a;
+}
+
+.resumen-nota {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0.3rem 0 0;
+  line-height: 1.45;
+}
+
 /* ---------- notas por item ---------- */
 .saldo-bloque {
   border-bottom: 1px dashed transparent;

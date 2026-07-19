@@ -15,8 +15,12 @@ interface Props {
 export function Saldos({ semana, semanaAnterior }: Props) {
   const [agrupadores, setAgrupadores] = useState<Agrupador[]>([])
   const [items, setItems] = useState<ItemBalance[]>([])
-  // itemId -> monto guardado
+  // itemId -> monto guardado en la semana activa
   const [saldos, setSaldos] = useState<Record<number, number>>({})
+  // itemId -> monto de la semana anterior (para el gasto por reconciliacion)
+  const [saldosAnterior, setSaldosAnterior] = useState<Record<number, number>>(
+    {},
+  )
   // itemId -> lo que el usuario esta escribiendo (puede ser una operacion)
   const [textos, setTextos] = useState<Record<number, string>>({})
   const [errores, setErrores] = useState<Record<number, string>>({})
@@ -31,16 +35,19 @@ export function Saldos({ semana, semanaAnterior }: Props) {
 
   useEffect(() => {
     void cargar()
-  }, [semana.id])
+  }, [semana.id, semanaAnterior?.id])
 
   async function cargar() {
     setCargando(true)
     setError(null)
     try {
-      const [ags, its, sal] = await Promise.all([
+      const [ags, its, sal, salAnt] = await Promise.all([
         listarAgrupadores(),
         listarItems(),
         listarSaldosDeSemana(semana.id),
+        semanaAnterior
+          ? listarSaldosDeSemana(semanaAnterior.id)
+          : Promise.resolve([]),
       ])
       setAgrupadores(ags)
       setItems(its)
@@ -48,6 +55,10 @@ export function Saldos({ semana, semanaAnterior }: Props) {
       const mapa: Record<number, number> = {}
       for (const s of sal) mapa[s.item_id] = s.monto
       setSaldos(mapa)
+
+      const mapaAnt: Record<number, number> = {}
+      for (const s of salAnt) mapaAnt[s.item_id] = s.monto
+      setSaldosAnterior(mapaAnt)
 
       const txt: Record<number, string> = {}
       for (const it of its) {
@@ -167,19 +178,33 @@ export function Saldos({ semana, semanaAnterior }: Props) {
 
   const sinSaldos = Object.keys(saldos).length === 0
 
-  function totalDeAgrupador(agrupadorId: number): number {
+  function totalDeAgrupador(
+    agrupadorId: number,
+    mapa: Record<number, number> = saldos,
+  ): number {
     return items
       .filter((i) => i.agrupador_id === agrupadorId)
-      .reduce((acc, it) => acc + (saldos[it.id] ?? 0), 0)
+      .reduce((acc, it) => acc + (mapa[it.id] ?? 0), 0)
   }
 
   // Patrimonio neto = liquidez + patrimonio − deudas.
   // Nunca se guarda en la base: siempre se calcula desde los saldos.
-  const porTipo = { liquidez: 0, patrimonio: 0, deuda: 0 }
-  for (const a of agrupadores) porTipo[a.tipo] += totalDeAgrupador(a.id)
-  const tengo = porTipo.liquidez + porTipo.patrimonio
-  const debo = porTipo.deuda
-  const neto = tengo - debo
+  function calcularNeto(mapa: Record<number, number>) {
+    const t = { liquidez: 0, patrimonio: 0, deuda: 0 }
+    for (const a of agrupadores) t[a.tipo] += totalDeAgrupador(a.id, mapa)
+    const tengo = t.liquidez + t.patrimonio
+    return { ...t, tengo, debo: t.deuda, neto: tengo - t.deuda }
+  }
+
+  const actual = calcularNeto(saldos)
+
+  // Gasto por reconciliacion = neto(semana anterior) − neto(semana actual).
+  // Cuando existan los ingresos (HU-011) la formula sumara los de la semana.
+  const anteriorTieneSaldos = Object.keys(saldosAnterior).length > 0
+  const netoAnterior = anteriorTieneSaldos
+    ? calcularNeto(saldosAnterior).neto
+    : null
+  const gasto = netoAnterior !== null ? netoAnterior - actual.neto : null
 
   return (
     <div className="saldos">
@@ -202,21 +227,60 @@ export function Saldos({ semana, semanaAnterior }: Props) {
           <div className="resumen-linea">
             <span className="resumen-etiqueta">Tengo</span>
             <span className="resumen-detalle">
-              liquidez {formatearCOP(porTipo.liquidez)} · patrimonio{' '}
-              {formatearCOP(porTipo.patrimonio)}
+              liquidez {formatearCOP(actual.liquidez)} · patrimonio{' '}
+              {formatearCOP(actual.patrimonio)}
             </span>
-            <span className="resumen-valor">{formatearCOP(tengo)}</span>
+            <span className="resumen-valor">{formatearCOP(actual.tengo)}</span>
           </div>
           <div className="resumen-linea">
             <span className="resumen-etiqueta">Debo</span>
             <span className="resumen-detalle">deudas</span>
             <span className="resumen-valor resumen-negativo">
-              − {formatearCOP(debo)}
+              − {formatearCOP(actual.debo)}
             </span>
           </div>
           <div className="resumen-linea resumen-total">
             <span className="resumen-etiqueta">Patrimonio neto</span>
-            <span className="resumen-valor">{formatearCOP(neto)}</span>
+            <span className="resumen-valor">{formatearCOP(actual.neto)}</span>
+          </div>
+
+          <div className="resumen-gasto">
+            {!semanaAnterior && (
+              <p className="resumen-nota">
+                Es tu primera semana registrada: todavía no hay con qué
+                comparar.
+              </p>
+            )}
+
+            {semanaAnterior && !anteriorTieneSaldos && (
+              <p className="resumen-nota">
+                La semana anterior ({semanaAnterior.rango}) no tiene saldos, así
+                que no se puede calcular el gasto.
+              </p>
+            )}
+
+            {semanaAnterior && anteriorTieneSaldos && gasto !== null && (
+              <>
+                <div className="resumen-linea">
+                  <span className="resumen-etiqueta">
+                    {gasto >= 0 ? 'Gasto de la semana' : 'Tu patrimonio creció'}
+                  </span>
+                  <span className="resumen-detalle">
+                    vs {semanaAnterior.rango} ({formatearCOP(netoAnterior ?? 0)})
+                  </span>
+                  <span className="resumen-valor resumen-gasto-valor">
+                    {formatearCOP(Math.abs(gasto))}
+                  </span>
+                </div>
+                {gasto < 0 && (
+                  <p className="resumen-nota">
+                    El neto subió en vez de bajar. Normalmente significa que
+                    entró un ingreso; cuando registremos ingresos (HU-011) la
+                    fórmula los tendrá en cuenta.
+                  </p>
+                )}
+              </>
+            )}
           </div>
         </div>
       )}
