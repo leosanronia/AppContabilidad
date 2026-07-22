@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Agrupadores } from './components/Agrupadores'
+import { Categorias } from './components/Categorias'
 import { Semanas } from './components/Semanas'
 
 type Vista = 'semanas' | 'configuracion'
@@ -31,7 +32,14 @@ function App() {
         </button>
       </nav>
 
-      {vista === 'semanas' ? <Semanas /> : <Agrupadores />}
+      {vista === 'semanas' ? (
+        <Semanas />
+      ) : (
+        <>
+          <Agrupadores />
+          <Categorias />
+        </>
+      )}
     </div>
   )
 }

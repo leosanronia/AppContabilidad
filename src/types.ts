@@ -31,6 +31,27 @@ export interface SaldoSemana {
   monto: number
 }
 
+export interface Categoria {
+  id: number
+  nombre: string
+  grupo: string | null
+  // Monto usual: la plantilla con la que arranca el presupuesto del mes.
+  monto_default: number
+  orden: number
+  activo: boolean
+}
+
+export const GRUPOS: { valor: string; etiqueta: string }[] = [
+  { valor: 'fijos', etiqueta: 'Fijos' },
+  { valor: 'inversion', etiqueta: 'Inversión' },
+  { valor: 'otros', etiqueta: 'Otros' },
+]
+
+export function etiquetaGrupo(grupo: string | null): string {
+  if (!grupo) return 'Sin grupo'
+  return GRUPOS.find((g) => g.valor === grupo)?.etiqueta ?? grupo
+}
+
 export interface Semana {
   id: number
   mes_id: number
