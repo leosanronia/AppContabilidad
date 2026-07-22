@@ -1,7 +1,7 @@
 import { supabase } from '../supabaseClient'
 import type { Ingreso } from '../types'
 
-const COLS = 'id, semana_id, nombre, monto'
+const COLS = 'id, semana_id, nombre, monto, categoria_ingreso_id'
 
 function normalizar(i: Ingreso): Ingreso {
   return { ...i, monto: Number(i.monto) }
@@ -29,12 +29,18 @@ export async function listarTodosLosIngresos(): Promise<Ingreso[]> {
 
 export async function crearIngreso(
   semanaId: number,
-  nombre: string,
+  categoriaIngresoId: number | null,
   monto: number,
+  detalle: string,
 ): Promise<Ingreso> {
   const { data, error } = await supabase
     .from('ingresos')
-    .insert({ semana_id: semanaId, nombre, monto })
+    .insert({
+      semana_id: semanaId,
+      categoria_ingreso_id: categoriaIngresoId,
+      monto,
+      nombre: detalle,
+    })
     .select(COLS)
     .single()
   if (error) throw new Error(error.message)
@@ -43,7 +49,7 @@ export async function crearIngreso(
 
 export async function actualizarIngreso(
   id: number,
-  cambios: Partial<Pick<Ingreso, 'nombre' | 'monto'>>,
+  cambios: Partial<Pick<Ingreso, 'nombre' | 'monto' | 'categoria_ingreso_id'>>,
 ): Promise<void> {
   const { error } = await supabase.from('ingresos').update(cambios).eq('id', id)
   if (error) throw new Error(error.message)

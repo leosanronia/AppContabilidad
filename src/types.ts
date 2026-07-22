@@ -52,11 +52,23 @@ export interface LineaPresupuesto {
   plan: number
 }
 
+// Lista fija de origenes de ingreso (INT, Arriendo, Prima...). Tabla propia,
+// separada de las categorias del presupuesto de gastos.
+export interface CategoriaIngreso {
+  id: number
+  nombre: string
+  orden: number
+  activo: boolean
+}
+
 export interface Ingreso {
   id: number
   semana_id: number
+  // Detalle libre opcional (ej. "bono extra"). La clasificacion real la da
+  // categoria_ingreso_id.
   nombre: string
   monto: number
+  categoria_ingreso_id: number | null
 }
 
 export type TipoMovimiento = 'gasto' | 'ingreso'

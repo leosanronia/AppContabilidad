@@ -1040,6 +1040,11 @@ code {
   white-space: nowrap;
 }
 
+.ingreso-detalle {
+  color: var(--subtexto);
+  font-size: 0.82rem;
+}
+
 .ingreso-form {
   display: flex;
   gap: 0.4rem;

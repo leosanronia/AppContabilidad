@@ -1,10 +1,11 @@
-import { useState, type FormEvent } from 'react'
-import type { Ingreso } from '../types'
+import { useEffect, useState, type FormEvent } from 'react'
+import type { CategoriaIngreso, Ingreso } from '../types'
 import {
   actualizarIngreso,
   crearIngreso,
   eliminarIngreso,
 } from '../api/ingresos'
+import { listarCategoriasIngreso } from '../api/categoriasIngreso'
 import { evaluarMonto } from '../utils/calculadora'
 import { formatearCOP } from '../utils/moneda'
 
@@ -15,17 +16,37 @@ interface Props {
 }
 
 // Ingresos que cayeron en UNA semana (INT, Prima, Arriendo...). La suma
-// alimenta la reconciliacion del gasto (HU-008).
+// alimenta la reconciliacion del gasto (HU-008). El origen se elige de una
+// lista fija para poder analizarlos despues (HU-024).
 export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
-  const [nombre, setNombre] = useState('')
+  const [categorias, setCategorias] = useState<CategoriaIngreso[]>([])
+  const [categoriaId, setCategoriaId] = useState('')
+  const [detalle, setDetalle] = useState('')
   const [monto, setMonto] = useState('')
   const [editandoId, setEditandoId] = useState<number | null>(null)
-  const [eNombre, setENombre] = useState('')
+  const [eCategoria, setECategoria] = useState('')
+  const [eDetalle, setEDetalle] = useState('')
   const [eMonto, setEMonto] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    void (async () => {
+      try {
+        setCategorias(await listarCategoriasIngreso())
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e))
+      }
+    })()
+  }, [])
+
+  const activas = categorias.filter((c) => c.activo)
   const total = ingresos.reduce((acc, i) => acc + i.monto, 0)
+
+  function nombreCategoria(id: number | null): string {
+    if (id === null) return 'Sin categoría'
+    return categorias.find((c) => c.id === id)?.nombre ?? 'Sin categoría'
+  }
 
   function correr(fn: () => Promise<void>) {
     setError(null)
@@ -44,8 +65,6 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
 
   function agregar(e: FormEvent) {
     e.preventDefault()
-    const n = nombre.trim()
-    if (!n) return
     let valor: number
     try {
       valor = evaluarMonto(monto)
@@ -54,15 +73,19 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
       return
     }
     correr(async () => {
-      await crearIngreso(semanaId, n, valor)
-      setNombre('')
+      await crearIngreso(
+        semanaId,
+        categoriaId === '' ? null : Number(categoriaId),
+        valor,
+        detalle.trim(),
+      )
       setMonto('')
+      setDetalle('')
+      // La categoria se conserva: suele registrarse varias veces la misma.
     })
   }
 
   function guardarEdicion(id: number) {
-    const n = eNombre.trim()
-    if (!n) return
     let valor: number
     try {
       valor = evaluarMonto(eMonto)
@@ -71,13 +94,18 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
       return
     }
     correr(async () => {
-      await actualizarIngreso(id, { nombre: n, monto: valor })
+      await actualizarIngreso(id, {
+        categoria_ingreso_id: eCategoria === '' ? null : Number(eCategoria),
+        nombre: eDetalle.trim(),
+        monto: valor,
+      })
       setEditandoId(null)
     })
   }
 
   function borrar(i: Ingreso) {
-    if (!confirm(`¿Eliminar el ingreso "${i.nombre}" de ${formatearCOP(i.monto)}?`))
+    const etiqueta = nombreCategoria(i.categoria_ingreso_id)
+    if (!confirm(`¿Eliminar el ingreso "${etiqueta}" de ${formatearCOP(i.monto)}?`))
       return
     correr(async () => {
       await eliminarIngreso(i.id)
@@ -97,10 +125,23 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
             <li className="ingreso-fila" key={i.id}>
               {editandoId === i.id ? (
                 <>
+                  <select
+                    className="input input-sm"
+                    value={eCategoria}
+                    onChange={(e) => setECategoria(e.target.value)}
+                  >
+                    <option value="">Sin categoría</option>
+                    {activas.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.nombre}
+                      </option>
+                    ))}
+                  </select>
                   <input
                     className="input input-sm"
-                    value={eNombre}
-                    onChange={(e) => setENombre(e.target.value)}
+                    placeholder="Detalle (opcional)"
+                    value={eDetalle}
+                    onChange={(e) => setEDetalle(e.target.value)}
                   />
                   <input
                     className="input input-sm saldo-input"
@@ -110,7 +151,7 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
                   <button
                     className="btn btn-sm btn-primario"
                     onClick={() => guardarEdicion(i.id)}
-                    disabled={ocupado || !eNombre.trim()}
+                    disabled={ocupado}
                   >
                     Guardar
                   </button>
@@ -123,14 +164,24 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
                 </>
               ) : (
                 <>
-                  <span className="ingreso-nombre">{i.nombre}</span>
+                  <span className="ingreso-nombre">
+                    {nombreCategoria(i.categoria_ingreso_id)}
+                    {i.nombre && (
+                      <span className="ingreso-detalle"> · {i.nombre}</span>
+                    )}
+                  </span>
                   <span className="ingreso-monto">{formatearCOP(i.monto)}</span>
                   <div className="fila-acciones">
                     <button
                       className="btn btn-sm btn-ghost"
                       onClick={() => {
                         setEditandoId(i.id)
-                        setENombre(i.nombre)
+                        setECategoria(
+                          i.categoria_ingreso_id === null
+                            ? ''
+                            : String(i.categoria_ingreso_id),
+                        )
+                        setEDetalle(i.nombre ?? '')
                         setEMonto(String(i.monto))
                       }}
                       disabled={ocupado}
@@ -152,12 +203,31 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
         </ul>
       )}
 
+      {activas.length === 0 && (
+        <p className="items-vacio">
+          Primero crea tus categorías de ingreso en Configuración.
+        </p>
+      )}
+
       <form className="ingreso-form" onSubmit={agregar}>
+        <select
+          className="input input-sm"
+          value={categoriaId}
+          onChange={(e) => setCategoriaId(e.target.value)}
+          aria-label="Origen del ingreso"
+        >
+          <option value="">Sin categoría</option>
+          {activas.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nombre}
+            </option>
+          ))}
+        </select>
         <input
           className="input input-sm"
-          placeholder="Nombre (ej. INT, Prima, Arriendo)"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
+          placeholder="Detalle (opcional)"
+          value={detalle}
+          onChange={(e) => setDetalle(e.target.value)}
         />
         <input
           className="input input-sm saldo-input"
@@ -168,7 +238,7 @@ export function IngresosSemana({ semanaId, ingresos, onCambio }: Props) {
         <button
           className="btn btn-sm btn-primario"
           type="submit"
-          disabled={ocupado || !nombre.trim() || monto.trim() === ''}
+          disabled={ocupado || monto.trim() === ''}
         >
           Agregar ingreso
         </button>

@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabaseClient'
 import { Agrupadores } from './components/Agrupadores'
 import { Categorias } from './components/Categorias'
+import { CategoriasIngreso } from './components/CategoriasIngreso'
 import { Gastos } from './components/Gastos'
 import { Login } from './components/Login'
 import { Presupuesto } from './components/Presupuesto'
@@ -95,6 +96,7 @@ function App() {
         <>
           <Agrupadores />
           <Categorias />
+          <CategoriasIngreso />
         </>
       )}
     </div>

@@ -234,7 +234,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
       <tbody>
         <tr><td><strong>F0 · Fundaciones</strong></td><td>Proyecto, base de datos en la nube y deploy.</td><td>HU-001 a HU-002</td><td><span class="estado completada">Completada</span></td></tr>
         <tr><td><strong>F1 · MVP — Balance semanal</strong></td><td>Cuentas, saldos por semana, neto y gasto por reconciliación.</td><td>HU-003 a HU-009, HU-023</td><td><span class="estado encurso">En curso</span></td></tr>
-        <tr><td><strong>F2 · Registro desde el celular</strong></td><td>Anotar gastos con categoría e ingresos durante la semana.</td><td>HU-010 a HU-011</td><td><span class="estado encurso">En curso</span></td></tr>
+        <tr><td><strong>F2 · Registro desde el celular</strong></td><td>Anotar gastos con categoría e ingresos durante la semana.</td><td>HU-010, HU-011, HU-024</td><td><span class="estado encurso">En curso</span></td></tr>
         <tr><td><strong>F3 · Presupuesto mensual</strong></td><td>Plantilla por defecto, Plan vs Gasto, Por pagar con arrastre.</td><td>HU-012 a HU-014</td><td><span class="estado encurso">En curso</span></td></tr>
         <tr><td><strong>F4 · Me debo</strong></td><td>Estacionar gastos futuros y promoverlos al presupuesto.</td><td>HU-015 a HU-016</td><td><span class="estado pendiente">Pendiente</span></td></tr>
         <tr><td><strong>F5 · Validadores</strong></td><td>Validador semanal y Disponible mensual automáticos.</td><td>HU-017 a HU-018</td><td><span class="estado pendiente">Pendiente</span></td></tr>
@@ -248,8 +248,8 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
   <section>
     <h2>5. Tablero de seguimiento</h2>
     <p>
-      Estado global: <strong>23 historias</strong> · <strong>14 completadas</strong> ·
-      <strong>2 en curso</strong> · <strong>7 pendientes</strong>.
+      Estado global: <strong>24 historias</strong> · <strong>14 completadas</strong> ·
+      <strong>3 en curso</strong> · <strong>7 pendientes</strong>.
       (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
     </p>
     <table>
@@ -269,6 +269,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <tr><td><code>HU-023</code></td><td>Notas por ítem</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-010</code></td><td>Anotar un gasto desde el celular</td><td>F2</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
         <tr><td><code>HU-011</code></td><td>Registrar ingresos</td><td>F2</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
+        <tr><td><code>HU-024</code></td><td>Categorías de ingreso</td><td>F2</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
         <tr><td><code>HU-012</code></td><td>Categorías con plantilla por defecto</td><td>F3</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
         <tr><td><code>HU-013</code></td><td>Armar el presupuesto del mes</td><td>F3</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
         <tr><td><code>HU-014</code></td><td>Plan vs Gasto vs Por pagar con arrastre</td><td>F3</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
@@ -612,6 +613,32 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         la <strong>semana</strong> (no solo al mes, como decía el DDL original del brief), porque la
         reconciliación necesita los de la semana; el total del mes se obtiene sumando sus semanas.
         Un ingreso que entra a mitad de semana simplemente pertenece a esa semana.</p>
+    </div>
+
+    <div class="card">
+      <div class="hu-head">
+        <h3>HU-024 · Categorías de ingreso</h3>
+        <span class="estado encurso">En curso</span>
+      </div>
+      <div class="historia">Como usuario quiero elegir el ingreso de una lista fija (INT, Arriendo,
+        Prima…) en vez de escribirlo a mano cada vez, para que no queden variantes del mismo
+        ingreso («INT», «Inteia», «int») y poder analizar después de dónde viene mi plata.</div>
+      <ul class="lista">
+        <li>Puedo crear, editar, reordenar, desactivar y eliminar categorías de ingreso desde
+          Configuración.</li>
+        <li>Al registrar un ingreso elijo la categoría de una lista; si es algo nuevo, primero la
+          creo.</li>
+        <li>Opcionalmente puedo añadir un detalle libre al ingreso (ej. «bono extra»), sin que eso
+          rompa la categorización.</li>
+        <li>Los ingresos ya registrados conservan su información: sus nombres actuales se convierten
+          en categorías automáticamente.</li>
+      </ul>
+      <p style="font-size:14px;"><strong>Origen:</strong> solicitada por el usuario el 21 jul 2026
+        (alcance nuevo), pensando en el análisis de ingresos de la Fase 6.
+        <strong>Decisión de diseño:</strong> tabla propia <code>categorias_ingreso</code>, separada
+        de <code>categorias</code> (que son las del presupuesto de gastos); mezclarlas ensuciaría el
+        presupuesto con líneas que no son gasto. Requiere la migración
+        <code>supabase/migracion_07_categorias_ingreso.sql</code>.</p>
     </div>
   </section>
 
