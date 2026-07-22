@@ -59,6 +59,8 @@ export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
       setAgrupadores(ags)
       setItems(its)
       setIngresos(ings)
+      // Por defecto todo contraido: se ven solo los totales por agrupador.
+      setContraidos(new Set(ags.map((a) => a.id)))
 
       const mapa: Record<number, number> = {}
       for (const s of sal) mapa[s.item_id] = s.monto
