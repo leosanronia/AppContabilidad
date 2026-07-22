@@ -239,7 +239,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <tr><td><strong>F4 · Me debo</strong></td><td>Estacionar gastos futuros y promoverlos al presupuesto.</td><td>HU-015 a HU-016</td><td><span class="estado pendiente">Pendiente</span></td></tr>
         <tr><td><strong>F5 · Validadores</strong></td><td>Validador semanal y Disponible mensual automáticos.</td><td>HU-017 a HU-018</td><td><span class="estado pendiente">Pendiente</span></td></tr>
         <tr><td><strong>F6 · Historia y análisis</strong></td><td>Import del Excel, dashboards, proyecciones.</td><td>HU-019 a HU-021</td><td><span class="estado pendiente">Pendiente</span></td></tr>
-        <tr><td><strong>F7 · Seguridad</strong></td><td>Login y Row Level Security.</td><td>HU-022</td><td><span class="estado encurso">En curso</span></td></tr>
+        <tr><td><strong>F7 · Seguridad</strong></td><td>Login y Row Level Security.</td><td>HU-022</td><td><span class="estado completada">Completada</span></td></tr>
       </tbody>
     </table>
   </section>
@@ -248,8 +248,8 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
   <section>
     <h2>5. Tablero de seguimiento</h2>
     <p>
-      Estado global: <strong>23 historias</strong> · <strong>12 completadas</strong> ·
-      <strong>2 en curso</strong> · <strong>9 pendientes</strong>.
+      Estado global: <strong>23 historias</strong> · <strong>13 completadas</strong> ·
+      <strong>1 en curso</strong> · <strong>9 pendientes</strong>.
       (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
     </p>
     <table>
@@ -279,7 +279,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <tr><td><code>HU-019</code></td><td>Importar el histórico del Excel</td><td>F6</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-020</code></td><td>Dashboard de evolución</td><td>F6</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-021</code></td><td>Supuestos y proyecciones simples</td><td>F6</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
-        <tr><td><code>HU-022</code></td><td>Login y protección de los datos</td><td>F7</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
+        <tr><td><code>HU-022</code></td><td>Login y protección de los datos</td><td>F7</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
       </tbody>
     </table>
   </section>
@@ -806,16 +806,26 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
     <div class="card">
       <div class="hu-head">
         <h3>HU-022 · Login y protección de los datos</h3>
-        <span class="estado encurso">En curso</span>
+        <span class="estado completada">Completada · 21 jul 2026</span>
       </div>
       <div class="historia">Como usuario quiero que solo yo pueda ver mis finanzas, porque la app
         vive en una URL pública y son datos sensibles.</div>
       <ul class="lista">
         <li>Autenticación con Supabase Auth (un solo usuario: yo).</li>
-        <li>Row Level Security activado: columna <code>user_id</code> en las tablas y políticas
-          por usuario.</li>
+        <li>Row Level Security activado, con política «solo usuarios autenticados».</li>
         <li>Sin sesión iniciada, la URL pública no muestra ningún dato.</li>
       </ul>
+      <p><strong>Completada (21 jul 2026).</strong> Pantalla de login (Supabase Auth, correo y
+        contraseña) que protege toda la app; botón «Salir» y sesión persistente por dispositivo.
+        RLS activado en las 8 tablas (<code>supabase/migracion_05_rls.sql</code>) con política de
+        solo-autenticados. <strong>Verificado con la anon key sin sesión:</strong> las 8 tablas
+        devuelven 0 filas a la lectura, y un intento de escritura es rechazado con HTTP 401 («new
+        row violates row-level security policy»). Login confirmado por el usuario.</p>
+      <p style="font-size:14px;"><strong>Decisión de diseño:</strong> al ser un solo usuario se usó
+        política de rol autenticado en vez de columna <code>user_id</code> por tabla (más simple, sin
+        migrar datos). Si en el futuro hay multiusuario, se agregaría <code>user_id</code> +
+        políticas por usuario. Recomendado: desactivar el registro público en Supabase para que la
+        única cuenta autenticada sea la del dueño.</p>
     </div>
   </section>
 
