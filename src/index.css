@@ -337,6 +337,110 @@ code {
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------- gastos (registro rapido) ---------- */
+.campo-ancho {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.campo-ancho .input {
+  width: 100%;
+}
+
+.form-gasto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-gasto-fila {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.form-gasto-fila .input {
+  flex: 1 1 45%;
+  min-width: 120px;
+}
+
+.btn-ancho {
+  width: 100%;
+  padding: 0.7rem;
+}
+
+.gastos-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  background: var(--azul);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.gastos-total strong {
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.mov-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--linea-suave);
+  flex-wrap: wrap;
+}
+
+.mov-fila:last-child {
+  border-bottom: none;
+}
+
+.mov-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+
+.mov-cat {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.mov-desc {
+  font-size: 0.82rem;
+  color: var(--subtexto);
+}
+
+.mov-fecha {
+  font-size: 0.72rem;
+  color: var(--subtexto);
+}
+
+.mov-monto {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mov-edicion {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: center;
+}
+
+.mov-edicion .input {
+  flex: 1 1 45%;
+  min-width: 110px;
+}
+
 /* ---------- avisos ---------- */
 .aviso {
   color: var(--subtexto);

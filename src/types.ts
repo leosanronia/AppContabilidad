@@ -41,6 +41,18 @@ export interface Categoria {
   activo: boolean
 }
 
+export type TipoMovimiento = 'gasto' | 'ingreso'
+
+export interface Movimiento {
+  id: number
+  semana_id: number
+  categoria_id: number | null
+  monto: number
+  tipo: TipoMovimiento
+  descripcion: string | null
+  fecha: string | null
+}
+
 export const GRUPOS: { valor: string; etiqueta: string }[] = [
   { valor: 'fijos', etiqueta: 'Fijos' },
   { valor: 'inversion', etiqueta: 'Inversión' },

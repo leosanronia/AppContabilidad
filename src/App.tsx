@@ -1,9 +1,16 @@
 import { useState } from 'react'
 import { Agrupadores } from './components/Agrupadores'
 import { Categorias } from './components/Categorias'
+import { Gastos } from './components/Gastos'
 import { Semanas } from './components/Semanas'
 
-type Vista = 'semanas' | 'configuracion'
+type Vista = 'semanas' | 'gastos' | 'configuracion'
+
+const TITULOS: Record<Vista, string> = {
+  semanas: 'Semanas',
+  gastos: 'Gastos',
+  configuracion: 'Configuración',
+}
 
 function App() {
   const [vista, setVista] = useState<Vista>('semanas')
@@ -12,9 +19,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <p className="eyebrow">App de finanzas personales</p>
-        <h1 className="app-titulo">
-          {vista === 'semanas' ? 'Semanas' : 'Configuración'}
-        </h1>
+        <h1 className="app-titulo">{TITULOS[vista]}</h1>
       </header>
 
       <nav className="tabs">
@@ -25,6 +30,12 @@ function App() {
           Semanas
         </button>
         <button
+          className={`tab ${vista === 'gastos' ? 'tab-activa' : ''}`}
+          onClick={() => setVista('gastos')}
+        >
+          Gastos
+        </button>
+        <button
           className={`tab ${vista === 'configuracion' ? 'tab-activa' : ''}`}
           onClick={() => setVista('configuracion')}
         >
@@ -32,9 +43,9 @@ function App() {
         </button>
       </nav>
 
-      {vista === 'semanas' ? (
-        <Semanas />
-      ) : (
+      {vista === 'semanas' && <Semanas />}
+      {vista === 'gastos' && <Gastos />}
+      {vista === 'configuracion' && (
         <>
           <Agrupadores />
           <Categorias />
