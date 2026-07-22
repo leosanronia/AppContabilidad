@@ -111,6 +111,17 @@ export function Categorias() {
     })
   }
 
+  // Marca la categoria "Semanas": su gasto no se anota, sale de la
+  // reconciliacion semanal.
+  function alternarReconciliacion(c: Categoria) {
+    ejecutar(async () => {
+      await actualizarCategoria(c.id, {
+        usa_reconciliacion: !c.usa_reconciliacion,
+      })
+      await cargar()
+    })
+  }
+
   function eliminar(c: Categoria) {
     if (
       !confirm(
@@ -247,7 +258,17 @@ export function Categorias() {
                   </div>
                 ) : (
                   <>
-                    <span className="fila-nombre">{c.nombre}</span>
+                    <span className="fila-nombre">
+                      {c.nombre}
+                      {c.usa_reconciliacion && (
+                        <span
+                          className="marca-recon"
+                          title="Su gasto viene de la reconciliación semanal"
+                        >
+                          auto
+                        </span>
+                      )}
+                    </span>
                     <span className="badge badge-grupo">
                       {etiquetaGrupo(c.grupo)}
                     </span>
@@ -282,6 +303,14 @@ export function Categorias() {
                         }
                       >
                         {c.activo ? 'Desactivar' : 'Activar'}
+                      </button>
+                      <button
+                        className="btn btn-sm btn-ghost"
+                        onClick={() => alternarReconciliacion(c)}
+                        disabled={ocupado}
+                        title="Marca la línea «Semanas»: su gasto sale de la reconciliación, no de gastos anotados"
+                      >
+                        {c.usa_reconciliacion ? 'Gasto auto ✓' : 'Gasto auto'}
                       </button>
                       <button
                         className="btn btn-sm btn-ghost"

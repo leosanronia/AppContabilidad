@@ -45,6 +45,16 @@ export function anioDe(iso: string): number {
   return aFecha(iso).getFullYear()
 }
 
+// 1..12 a partir del nombre del mes ("Enero" -> 1). Sirve para ordenar los
+// meses cronologicamente, que es de lo que depende el arrastre del
+// presupuesto. Devuelve 0 si el nombre no se reconoce.
+export function numeroMes(nombre: string): number {
+  const i = MESES.findIndex(
+    (m) => m.toLowerCase() === nombre.trim().toLowerCase(),
+  )
+  return i === -1 ? 0 : i + 1
+}
+
 export interface MesCandidato {
   nombre: string
   anio: number

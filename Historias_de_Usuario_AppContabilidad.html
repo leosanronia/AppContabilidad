@@ -248,8 +248,8 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
   <section>
     <h2>5. Tablero de seguimiento</h2>
     <p>
-      Estado global: <strong>23 historias</strong> · <strong>13 completadas</strong> ·
-      <strong>1 en curso</strong> · <strong>9 pendientes</strong>.
+      Estado global: <strong>23 historias</strong> · <strong>14 completadas</strong> ·
+      <strong>2 en curso</strong> · <strong>7 pendientes</strong>.
       (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
     </p>
     <table>
@@ -268,10 +268,10 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <tr><td><code>HU-009</code></td><td>Historial de semanas</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>19 jul 2026</td></tr>
         <tr><td><code>HU-023</code></td><td>Notas por ítem</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-010</code></td><td>Anotar un gasto desde el celular</td><td>F2</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
-        <tr><td><code>HU-011</code></td><td>Registrar ingresos</td><td>F2</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
+        <tr><td><code>HU-011</code></td><td>Registrar ingresos</td><td>F2</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
         <tr><td><code>HU-012</code></td><td>Categorías con plantilla por defecto</td><td>F3</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
-        <tr><td><code>HU-013</code></td><td>Armar el presupuesto del mes</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
-        <tr><td><code>HU-014</code></td><td>Plan vs Gasto vs Por pagar con arrastre</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
+        <tr><td><code>HU-013</code></td><td>Armar el presupuesto del mes</td><td>F3</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
+        <tr><td><code>HU-014</code></td><td>Plan vs Gasto vs Por pagar con arrastre</td><td>F3</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
         <tr><td><code>HU-015</code></td><td>Estacionar un gasto futuro (Me debo)</td><td>F4</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-016</code></td><td>Promover un Me debo al presupuesto</td><td>F4</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-017</code></td><td>Validador de consistencia semanal</td><td>F5</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
@@ -588,7 +588,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
     <div class="card">
       <div class="hu-head">
         <h3>HU-011 · Registrar ingresos</h3>
-        <span class="estado encurso">En curso</span>
+        <span class="estado completada">Completada · 21 jul 2026</span>
       </div>
       <div class="historia">Como usuario quiero registrar los ingresos con su nombre (INT, Prima,
         Arriendo, Cesantías…) en la semana en que caen, para que la reconciliación semanal y el
@@ -602,6 +602,16 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li><strong>Pregunta abierta a resolver aquí:</strong> manejo exacto de un ingreso que
           entra a mitad de semana en la fórmula de reconciliación.</li>
       </ul>
+      <p><strong>Completada (21 jul 2026).</strong> Panel «Ingresos de la semana» en la pestaña
+        Semanas (nombre + monto con calculadora, editar y eliminar), y el gasto pasó a la fórmula
+        completa <code>neto_ant + ingresos − neto_act</code>, tanto en la semana activa como en el
+        historial. Verificado contra la base: con un ingreso de 300.000 y el neto bajando solo
+        100.000, calculó el gasto real de 400.000 (sin el ingreso habría dicho 100.000). Confirmado
+        por el usuario.</p>
+      <p style="font-size:14px;"><strong>Pregunta abierta resuelta:</strong> los ingresos se ligan a
+        la <strong>semana</strong> (no solo al mes, como decía el DDL original del brief), porque la
+        reconciliación necesita los de la semana; el total del mes se obtiene sumando sus semanas.
+        Un ingreso que entra a mitad de semana simplemente pertenece a esa semana.</p>
     </div>
   </section>
 

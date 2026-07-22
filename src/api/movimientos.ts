@@ -20,6 +20,14 @@ export async function listarMovimientosDeSemana(
   return (data ?? []).map(normalizar)
 }
 
+// Todos los movimientos: el presupuesto necesita agrupar el gasto por mes
+// y categoria sobre toda la historia.
+export async function listarMovimientos(): Promise<Movimiento[]> {
+  const { data, error } = await supabase.from('movimientos').select(COLS)
+  if (error) throw new Error(error.message)
+  return (data ?? []).map(normalizar)
+}
+
 export async function crearMovimiento(datos: {
   semanaId: number
   categoriaId: number | null

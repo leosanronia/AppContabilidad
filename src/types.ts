@@ -39,6 +39,17 @@ export interface Categoria {
   monto_default: number
   orden: number
   activo: boolean
+  // true = su Gasto viene de la reconciliacion semanal, no de movimientos
+  // anotados. Es la linea "Semanas" del Excel.
+  usa_reconciliacion: boolean
+}
+
+// El Plan de una categoria en un mes. gasto y por_pagar son derivados.
+export interface LineaPresupuesto {
+  id: number
+  mes_id: number
+  categoria_id: number
+  plan: number
 }
 
 export interface Ingreso {

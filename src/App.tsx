@@ -5,13 +5,15 @@ import { Agrupadores } from './components/Agrupadores'
 import { Categorias } from './components/Categorias'
 import { Gastos } from './components/Gastos'
 import { Login } from './components/Login'
+import { Presupuesto } from './components/Presupuesto'
 import { Semanas } from './components/Semanas'
 
-type Vista = 'semanas' | 'gastos' | 'configuracion'
+type Vista = 'semanas' | 'gastos' | 'presupuesto' | 'configuracion'
 
 const TITULOS: Record<Vista, string> = {
   semanas: 'Semanas',
   gastos: 'Gastos',
+  presupuesto: 'Presupuesto',
   configuracion: 'Configuración',
 }
 
@@ -73,6 +75,12 @@ function App() {
           Gastos
         </button>
         <button
+          className={`tab ${vista === 'presupuesto' ? 'tab-activa' : ''}`}
+          onClick={() => setVista('presupuesto')}
+        >
+          Presupuesto
+        </button>
+        <button
           className={`tab ${vista === 'configuracion' ? 'tab-activa' : ''}`}
           onClick={() => setVista('configuracion')}
         >
@@ -82,6 +90,7 @@ function App() {
 
       {vista === 'semanas' && <Semanas />}
       {vista === 'gastos' && <Gastos />}
+      {vista === 'presupuesto' && <Presupuesto />}
       {vista === 'configuracion' && (
         <>
           <Agrupadores />

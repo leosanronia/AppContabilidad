@@ -1,7 +1,7 @@
 import { supabase } from '../supabaseClient'
 import type { Categoria } from '../types'
 
-const COLS = 'id, nombre, grupo, monto_default, orden, activo'
+const COLS = 'id, nombre, grupo, monto_default, orden, activo, usa_reconciliacion'
 
 function normalizar(c: Categoria): Categoria {
   return { ...c, monto_default: Number(c.monto_default) }
@@ -35,7 +35,15 @@ export async function crearCategoria(
 export async function actualizarCategoria(
   id: number,
   cambios: Partial<
-    Pick<Categoria, 'nombre' | 'grupo' | 'monto_default' | 'orden' | 'activo'>
+    Pick<
+      Categoria,
+      | 'nombre'
+      | 'grupo'
+      | 'monto_default'
+      | 'orden'
+      | 'activo'
+      | 'usa_reconciliacion'
+    >
   >,
 ): Promise<void> {
   const { error } = await supabase.from('categorias').update(cambios).eq('id', id)

@@ -855,6 +855,132 @@ code {
   line-height: 1.45;
 }
 
+/* ---------- presupuesto ---------- */
+.tabs {
+  flex-wrap: wrap;
+}
+
+.cuadre {
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--linea);
+  background: var(--gris-cl, #f5f6f8);
+}
+
+.cuadre-ok {
+  background: #e6f4ec;
+  border-color: #a3d9b8;
+}
+
+.cuadre-sobra {
+  background: #fff8e6;
+  border-color: #f0dca4;
+}
+
+.cuadre-falta {
+  background: #fdecea;
+  border-color: #f5c2c0;
+}
+
+.cuadre-linea {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+  padding: 0.15rem 0;
+}
+
+.cuadre-linea strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.cuadre-destacado {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  margin-top: 0.35rem;
+  padding-top: 0.4rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cuadre-nota {
+  font-size: 0.78rem;
+  color: var(--subtexto);
+  margin: 0.4rem 0 0;
+}
+
+/* La tabla se desplaza sola en pantallas angostas. */
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla-presupuesto {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 560px;
+}
+
+.tabla-presupuesto th,
+.tabla-presupuesto td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--linea-suave);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabla-presupuesto thead th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--subtexto);
+  border-bottom: 2px solid var(--linea);
+}
+
+.tabla-presupuesto .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tabla-presupuesto tfoot td {
+  border-top: 2px solid var(--linea);
+  border-bottom: none;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+.tabla-presupuesto .negativo {
+  color: #b5342b;
+}
+
+.plan-input {
+  width: 110px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.arrastre {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--subtexto);
+  font-weight: 400;
+}
+
+.marca-recon {
+  display: inline-block;
+  margin-left: 0.4rem;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #e8f1fa;
+  color: var(--azul-med);
+  border-radius: 100px;
+  padding: 1px 7px;
+  font-weight: 700;
+  cursor: help;
+}
+
 /* ---------- ingresos de la semana ---------- */
 .ingresos-panel {
   border: 1px solid #cfe6d6;
