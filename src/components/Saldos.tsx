@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import type { Agrupador, ItemBalance, Semana } from '../types'
+import type { Agrupador, Ingreso, ItemBalance, Semana } from '../types'
 import { etiquetaTipo } from '../types'
 import { listarAgrupadores } from '../api/agrupadores'
 import { actualizarItem, listarItems } from '../api/items'
 import { copiarSaldos, guardarSaldo, listarSaldosDeSemana } from '../api/saldos'
+import { listarIngresosDeSemana } from '../api/ingresos'
 import { evaluarMonto } from '../utils/calculadora'
 import { formatearCOP } from '../utils/moneda'
+import { IngresosSemana } from './IngresosSemana'
 
 interface Props {
   semana: Semana
@@ -23,6 +25,8 @@ export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
   const [saldosAnterior, setSaldosAnterior] = useState<Record<number, number>>(
     {},
   )
+  // Ingresos que cayeron en la semana activa (para la reconciliacion).
+  const [ingresos, setIngresos] = useState<Ingreso[]>([])
   // itemId -> lo que el usuario esta escribiendo (puede ser una operacion)
   const [textos, setTextos] = useState<Record<number, string>>({})
   const [errores, setErrores] = useState<Record<number, string>>({})
@@ -43,16 +47,18 @@ export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
     setCargando(true)
     setError(null)
     try {
-      const [ags, its, sal, salAnt] = await Promise.all([
+      const [ags, its, sal, salAnt, ings] = await Promise.all([
         listarAgrupadores(),
         listarItems(),
         listarSaldosDeSemana(semana.id),
         semanaAnterior
           ? listarSaldosDeSemana(semanaAnterior.id)
           : Promise.resolve([]),
+        listarIngresosDeSemana(semana.id),
       ])
       setAgrupadores(ags)
       setItems(its)
+      setIngresos(ings)
 
       const mapa: Record<number, number> = {}
       for (const s of sal) mapa[s.item_id] = s.monto
@@ -73,6 +79,12 @@ export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
     } finally {
       setCargando(false)
     }
+  }
+
+  async function recargarIngresos() {
+    setIngresos(await listarIngresosDeSemana(semana.id))
+    // Los ingresos cambian el gasto de la semana: refresca el historial.
+    onSaldosCambiaron?.()
   }
 
   function alternarContraido(id: number) {
@@ -201,14 +213,18 @@ export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
   }
 
   const actual = calcularNeto(saldos)
+  const ingresosSemana = ingresos.reduce((acc, i) => acc + i.monto, 0)
 
-  // Gasto por reconciliacion = neto(semana anterior) − neto(semana actual).
-  // Cuando existan los ingresos (HU-011) la formula sumara los de la semana.
+  // Gasto por reconciliacion:
+  //   gasto = neto(semana anterior) + ingresos de la semana − neto(actual)
+  // Los ingresos suman porque entraron y subieron el neto; sin ellos, un
+  // ingreso se veria como "el patrimonio crecio" en vez de como gasto real.
   const anteriorTieneSaldos = Object.keys(saldosAnterior).length > 0
   const netoAnterior = anteriorTieneSaldos
     ? calcularNeto(saldosAnterior).neto
     : null
-  const gasto = netoAnterior !== null ? netoAnterior - actual.neto : null
+  const gasto =
+    netoAnterior !== null ? netoAnterior + ingresosSemana - actual.neto : null
 
   return (
     <div className="saldos">
@@ -270,7 +286,10 @@ export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
                     {gasto >= 0 ? 'Gasto de la semana' : 'Tu patrimonio creció'}
                   </span>
                   <span className="resumen-detalle">
-                    vs {semanaAnterior.rango} ({formatearCOP(netoAnterior ?? 0)})
+                    neto ant. {formatearCOP(netoAnterior ?? 0)}
+                    {ingresosSemana > 0 &&
+                      ` + ingresos ${formatearCOP(ingresosSemana)}`}{' '}
+                    − neto actual
                   </span>
                   <span className="resumen-valor resumen-gasto-valor">
                     {formatearCOP(Math.abs(gasto))}
@@ -278,15 +297,23 @@ export function Saldos({ semana, semanaAnterior, onSaldosCambiaron }: Props) {
                 </div>
                 {gasto < 0 && (
                   <p className="resumen-nota">
-                    El neto subió en vez de bajar. Normalmente significa que
-                    entró un ingreso; cuando registremos ingresos (HU-011) la
-                    fórmula los tendrá en cuenta.
+                    El neto subió más de lo que explican los ingresos
+                    registrados. Revisa si falta anotar algún ingreso de esta
+                    semana.
                   </p>
                 )}
               </>
             )}
           </div>
         </div>
+      )}
+
+      {!cargando && (
+        <IngresosSemana
+          semanaId={semana.id}
+          ingresos={ingresos}
+          onCambio={recargarIngresos}
+        />
       )}
 
       {!cargando && sinSaldos && semanaAnterior && (

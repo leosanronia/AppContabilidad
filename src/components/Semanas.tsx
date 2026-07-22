@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type {
   Agrupador,
+  Ingreso,
   ItemBalance,
   Mes,
   SaldoSemana,
@@ -17,6 +18,7 @@ import {
 import { listarAgrupadores } from '../api/agrupadores'
 import { listarItems } from '../api/items'
 import { listarTodosLosSaldos } from '../api/saldos'
+import { listarTodosLosIngresos } from '../api/ingresos'
 import {
   formatearRango,
   hoyISO,
@@ -37,6 +39,7 @@ export function Semanas() {
   const [agrupadores, setAgrupadores] = useState<Agrupador[]>([])
   const [items, setItems] = useState<ItemBalance[]>([])
   const [todosSaldos, setTodosSaldos] = useState<SaldoSemana[]>([])
+  const [todosIngresos, setTodosIngresos] = useState<Ingreso[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [ocupado, setOcupado] = useState(false)
@@ -81,27 +84,34 @@ export function Semanas() {
   }
 
   async function recargar(): Promise<Semana[]> {
-    const [ss, ms, ags, its, sal] = await Promise.all([
+    const [ss, ms, ags, its, sal, ings] = await Promise.all([
       listarSemanas(),
       listarMeses(),
       listarAgrupadores(),
       listarItems(),
       listarTodosLosSaldos(),
+      listarTodosLosIngresos(),
     ])
     setSemanas(ss)
     setMeses(ms)
     setAgrupadores(ags)
     setItems(its)
     setTodosSaldos(sal)
+    setTodosIngresos(ings)
     return ss
   }
 
-  // Se llama cuando la pantalla de saldos guarda algo, para que el historial
-  // (neto y gasto de cada semana) quede al dia sin recargar la pagina.
+  // Se llama cuando la pantalla de saldos guarda algo (saldo o ingreso), para
+  // que el historial (neto y gasto de cada semana) quede al dia sin recargar.
   function refrescarSaldos() {
     void (async () => {
       try {
-        setTodosSaldos(await listarTodosLosSaldos())
+        const [sal, ings] = await Promise.all([
+          listarTodosLosSaldos(),
+          listarTodosLosIngresos(),
+        ])
+        setTodosSaldos(sal)
+        setTodosIngresos(ings)
       } catch {
         // Un fallo al refrescar el historial no debe interrumpir la captura.
       }
@@ -212,14 +222,23 @@ export function Semanas() {
     })
   }
 
-  // gasto = neto(semana anterior) − neto(semana actual); null si no se puede.
+  // Ingresos de cada semana (suman en la formula del gasto).
+  const ingresosPorSemana = new Map<number, number>()
+  for (const ing of todosIngresos) {
+    ingresosPorSemana.set(
+      ing.semana_id,
+      (ingresosPorSemana.get(ing.semana_id) ?? 0) + ing.monto,
+    )
+  }
+
+  // gasto = neto(anterior) + ingresos(semana) − neto(semana); null si no se puede.
   const gastos = new Map<number, number | null>()
   semanas.forEach((s, i) => {
     const r = resumen.get(s.id)
     const previa = i > 0 ? semanas[i - 1] : null
     const rp = previa ? resumen.get(previa.id) : null
     if (!r?.tieneSaldos || !rp?.tieneSaldos) gastos.set(s.id, null)
-    else gastos.set(s.id, rp.neto - r.neto)
+    else gastos.set(s.id, rp.neto + (ingresosPorSemana.get(s.id) ?? 0) - r.neto)
   })
 
   const activa = semanas.find((s) => s.id === activaId) ?? null

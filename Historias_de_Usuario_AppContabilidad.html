@@ -248,8 +248,8 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
   <section>
     <h2>5. Tablero de seguimiento</h2>
     <p>
-      Estado global: <strong>23 historias</strong> · <strong>10 completadas</strong> ·
-      <strong>2 en curso</strong> · <strong>11 pendientes</strong>.
+      Estado global: <strong>23 historias</strong> · <strong>12 completadas</strong> ·
+      <strong>1 en curso</strong> · <strong>10 pendientes</strong>.
       (Actualizar esta línea y la tabla cada vez que cambie el estado de una HU.)
     </p>
     <table>
@@ -267,9 +267,9 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <tr><td><code>HU-008</code></td><td>Gasto de la semana calculado automáticamente</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
         <tr><td><code>HU-009</code></td><td>Historial de semanas</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>19 jul 2026</td></tr>
         <tr><td><code>HU-023</code></td><td>Notas por ítem</td><td>F1</td><td><span class="estado completada">Completada</span></td><td>17 jul 2026</td></tr>
-        <tr><td><code>HU-010</code></td><td>Anotar un gasto desde el celular</td><td>F2</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
-        <tr><td><code>HU-011</code></td><td>Registrar ingresos</td><td>F2</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
-        <tr><td><code>HU-012</code></td><td>Categorías con plantilla por defecto</td><td>F3</td><td><span class="estado encurso">En curso</span></td><td>19 jul 2026</td></tr>
+        <tr><td><code>HU-010</code></td><td>Anotar un gasto desde el celular</td><td>F2</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
+        <tr><td><code>HU-011</code></td><td>Registrar ingresos</td><td>F2</td><td><span class="estado encurso">En curso</span></td><td>21 jul 2026</td></tr>
+        <tr><td><code>HU-012</code></td><td>Categorías con plantilla por defecto</td><td>F3</td><td><span class="estado completada">Completada</span></td><td>21 jul 2026</td></tr>
         <tr><td><code>HU-013</code></td><td>Armar el presupuesto del mes</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-014</code></td><td>Plan vs Gasto vs Por pagar con arrastre</td><td>F3</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
         <tr><td><code>HU-015</code></td><td>Estacionar un gasto futuro (Me debo)</td><td>F4</td><td><span class="estado pendiente">Pendiente</span></td><td>—</td></tr>
@@ -565,7 +565,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
     <div class="card">
       <div class="hu-head">
         <h3>HU-010 · Anotar un gasto desde el celular</h3>
-        <span class="estado encurso">En curso</span>
+        <span class="estado completada">Completada · 21 jul 2026</span>
       </div>
       <div class="historia">Como usuario quiero anotar en el momento los gastos que tienen categoría
         del presupuesto (mercado, Claude, salud…), para no perderlos hasta la consolidación de fin
@@ -576,12 +576,18 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li>Cómodo en pantalla de celular: pocos taps, sin scroll innecesario.</li>
         <li>Veo la lista de lo anotado en la semana y puedo corregir o borrar.</li>
       </ul>
+      <p><strong>Completada (21 jul 2026).</strong> Pestaña Gastos pensada para el celular:
+        selector de semana, formulario compacto (monto con calculadora, categoría, descripción,
+        fecha), total de la semana y lista con editar/eliminar; al anotar conserva categoría y
+        fecha para registrar varios seguidos. Verificado contra la base, incluida la integridad:
+        borrar una categoría deja sus gastos sin categoría (no los pierde) y borrar una semana sí
+        borra sus gastos. Confirmado por el usuario, que ya anotó un gasto real.</p>
     </div>
 
     <div class="card">
       <div class="hu-head">
         <h3>HU-011 · Registrar ingresos</h3>
-        <span class="estado pendiente">Pendiente</span>
+        <span class="estado encurso">En curso</span>
       </div>
       <div class="historia">Como usuario quiero registrar los ingresos con su nombre (INT, Prima,
         Arriendo, Cesantías…) en la semana en que caen, para que la reconciliación semanal y el
@@ -605,7 +611,7 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
     <div class="card">
       <div class="hu-head">
         <h3>HU-012 · Categorías con plantilla por defecto</h3>
-        <span class="estado encurso">En curso</span>
+        <span class="estado completada">Completada · 21 jul 2026</span>
       </div>
       <div class="historia">Como usuario quiero un presupuesto por defecto editable (mis categorías
         con su monto usual: Cel, Mercado, Salud, Smart, Apto…), para que cada mes arranque
@@ -617,6 +623,12 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
           sin tocar la plantilla.</li>
         <li>Desactivar una categoría no borra su historia.</li>
       </ul>
+      <p><strong>Completada (21 jul 2026).</strong> En Configuración, «Mis categorías»: crear con
+        nombre, grupo (Fijos / Inversión / Otros) y monto usual (la plantilla), con editar,
+        reordenar, desactivar (sin perder historia) y eliminar; el monto acepta operaciones y abajo
+        se ve el total de la plantilla (activas). Requirió la migración 03
+        (<code>categorias</code> y <code>movimientos</code>). Verificado contra la base y confirmado
+        por el usuario. Nota: es prerequisito de la HU-010, por eso se hizo antes.</p>
     </div>
 
     <div class="card">
@@ -632,6 +644,11 @@ code { background: var(--azul-cl); color: var(--azul); border-radius: 4px; paddi
         <li>Señal visual clara cuando el presupuesto no cuadra con los ingresos.</li>
         <li>Si entra un ingreso nuevo a mitad de mes, puedo modificarlo y redistribuir.</li>
       </ul>
+      <p style="font-size:14px;"><strong>Decisión (21 jul 2026):</strong> el presupuesto incluirá
+        una línea especial <strong>«Semanas»</strong> para el gasto no rastreado por categoría. Su
+        <em>Gasto</em> no se anota a mano: se llena automáticamente con la reconciliación (Σ de los
+        gastos por reconciliación de las semanas de ese mes, HU-008), evitando el doble conteo. Por
+        eso «Semana» NO aparece en el desplegable de la pestaña Gastos. Confirmado con el usuario.</p>
     </div>
 
     <div class="card">

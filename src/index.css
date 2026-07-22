@@ -816,6 +816,75 @@ code {
   line-height: 1.45;
 }
 
+/* ---------- ingresos de la semana ---------- */
+.ingresos-panel {
+  border: 1px solid #cfe6d6;
+  background: #f3faf5;
+  border-radius: 10px;
+  padding: 0.8rem 0.95rem;
+  margin-bottom: 1.1rem;
+}
+
+.ingresos-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.ingresos-titulo {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a7a4a;
+}
+
+.ingresos-total {
+  font-variant-numeric: tabular-nums;
+  color: #1a7a4a;
+  font-size: 1.05rem;
+}
+
+.ingresos-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.6rem;
+}
+
+.ingreso-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #dcefe1;
+  flex-wrap: wrap;
+}
+
+.ingreso-fila:last-child {
+  border-bottom: none;
+}
+
+.ingreso-nombre {
+  flex: 1 1 auto;
+  font-size: 0.9rem;
+}
+
+.ingreso-monto {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ingreso-form {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.ingreso-form .input:first-child {
+  flex: 1 1 160px;
+}
+
 /* ---------- notas por item ---------- */
 .saldo-bloque {
   border-bottom: 1px dashed transparent;

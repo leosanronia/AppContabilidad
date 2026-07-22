@@ -41,6 +41,13 @@ export interface Categoria {
   activo: boolean
 }
 
+export interface Ingreso {
+  id: number
+  semana_id: number
+  nombre: string
+  monto: number
+}
+
 export type TipoMovimiento = 'gasto' | 'ingreso'
 
 export interface Movimiento {
